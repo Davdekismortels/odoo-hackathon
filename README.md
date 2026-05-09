@@ -6,8 +6,8 @@ This repository is set up to meet the **Must Have** requirements for the Odoo Ha
 
 ### ✅ 1. Proper Version Control (Git)
 - **Status**: fully configured.
-- **Why**: We have a shared GitLab repository. Every team member has access and can push their own changes.
-- **CI/CD**: A GitLab pipeline is active to automatically test every commit.
+- **Why**: We have a shared GitHub repository. Every team member has access and can push their own changes.
+- **CI/CD**: A GitHub Actions workflow is active to automatically test every commit.
 
 ### 🏗 2. Project Structure
 - **Custom Addons**: All work should happen in the `custom_addons/` directory.
@@ -26,7 +26,7 @@ This repository is set up to meet the **Must Have** requirements for the Odoo Ha
 - **Tip**: Organize your `menuitem` tags logically in `views/`.
 
 ## 📈 Getting Started
-1.  **Clone the repo**: `git clone git@gitlab.com:xshya19-group/xshya19-project.git`
+1.  **Clone the repo**: `git clone git@github.com:YOUR_USERNAME/YOUR_REPO.git`
 2.  **Read the Guide**: See [Teammate_Guide.md](Teammate_Guide.md) for detailed instructions.
 3.  **Start Coding**: Create your module inside `custom_addons/`.
 

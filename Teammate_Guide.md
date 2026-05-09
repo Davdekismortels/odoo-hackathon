@@ -1,11 +1,11 @@
-# 🚀 Team Guide: Collaborating on Our Odoo Project with GitLab
+# 🚀 Team Guide: Collaborating on Our Odoo Project with GitHub
 
 Welcome to the team! This guide will walk you through everything you need to know to start working on our Odoo project, even if you've never used GitLab or Git before.
 
 ---
 
-## 1. What is GitLab?
-Think of GitLab as a **shared folder for our code**, but much smarter. Instead of just overwriting each other's files, GitLab:
+## 1. What is GitHub?
+Think of GitHub as a **shared folder for our code**, but much smarter. Instead of just overwriting each other's files, GitHub:
 - Keeps a history of every change made (who, when, and what).
 - Allows us to work on the same files at the same time without breaking things.
 - Automatically tests our code to make sure it works.
@@ -15,11 +15,11 @@ Think of GitLab as a **shared folder for our code**, but much smarter. Instead o
 ## 2. Getting Started (One-Time Setup)
 
 ### Step A: Create Your Account
-1.  Go to [GitLab.com](https://gitlab.com) and sign up for an account if you haven't already.
+1.  Go to [GitHub.com](https://github.com) and sign up for an account if you haven't already.
 2.  Give your username to **Shyam** so they can invite you to the project.
 
 ### Step B: Set Up Your "ID Card" (SSH Key)
-To send your changes to GitLab, you need a secure way to identify yourself without typing your password every time. This is called an **SSH Key**.
+To send your changes to GitHub, you need a secure way to identify yourself without typing your password every time. This is called an **SSH Key**.
 
 1.  **Generate a Key**: Open your terminal (on Linux/Mac) or Git Bash (on Windows) and type:
     ```bash
@@ -29,9 +29,9 @@ To send your changes to GitLab, you need a secure way to identify yourself witho
 2.  **Copy the Key**:
     - **Linux**: `cat ~/.ssh/id_ed25519.pub`
     - **Windows**: Open `C:\Users\YourName\.ssh\id_ed25519.pub` in Notepad.
-3.  **Add to GitLab**:
-    - Go to [User Settings > SSH Keys](https://gitlab.com/-/profile/keys).
-    - Click **Add new key**, paste the text you copied, and click **Add key**.
+3.  **Add to GitHub**:
+    - Go to [Settings > SSH and GPG keys](https://github.com/settings/keys).
+    - Click **New SSH key**, paste the text you copied, and click **Add SSH key**.
 
 ---
 
@@ -39,10 +39,10 @@ To send your changes to GitLab, you need a secure way to identify yourself witho
 
 Once you are invited to the project, you need to "Clone" it (download a linked copy).
 
-1.  Find the project URL on GitLab (usually looks like `git@gitlab.com:xshya19-group/xshya19-project.git`).
+1.  Find the project URL on GitHub (usually looks like `git@github.com:YOUR_USERNAME/YOUR_REPO.git`).
 2.  In your terminal, go to where you want to keep the project and run:
     ```bash
-    git clone git@gitlab.com:xshya19-group/xshya19-project.git
+    git clone git@github.com:YOUR_USERNAME/YOUR_REPO.git
     ```
 
 ---
@@ -87,6 +87,6 @@ git push origin main
 ## 6. Odoo Project Structure
 - `custom_addons/`: **Work here!** Create your new modules or edit existing ones in this folder.
 - `odoo.conf.example`: A template for your local Odoo setup.
-- `.gitlab-ci.yml`: This is the "robot" that checks our code. Don't worry about editing this for now.
+- `.github/workflows/odoo-ci.yml`: This is the "robot" that checks our code. Don't worry about editing this for now.
 
 Happy coding! Let's build something great together. 🚀
