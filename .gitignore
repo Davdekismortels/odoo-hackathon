@@ -1,0 +1,35 @@
+# Odoo
+*.py[cod]
+*$py.class
+__pycache__/
+*.so
+.local/
+.cache/
+.config/
+.gnupg/
+.ssh/
+.pylint.d/
+.mypy_cache/
+.pytest_cache/
+.env
+.venv
+env/
+venv/
+ENV/
+
+# Odoo specific
+*.log
+*.sql
+*.sqlite
+filestore/
+sessions/
+odoo.conf
+!odoo.conf.example
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store

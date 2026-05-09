@@ -1,0 +1,28 @@
+image: odoo:17.0
+
+services:
+  - postgres:15
+
+variables:
+  POSTGRES_DB: postgres
+  POSTGRES_USER: odoo
+  POSTGRES_PASSWORD: odoo
+  POSTGRES_HOST_AUTH_METHOD: trust
+  ODOO_STAGE: test
+
+stages:
+  - lint
+  - test
+
+lint:
+  stage: lint
+  before_script:
+    - pip3 install pylint-odoo flake8
+  script:
+    - flake8 custom_addons/
+    - pylint --load-plugins=pylint_odoo custom_addons/
+
+test:
+  stage: test
+  script:
+    - odoo --test-enable --stop-after-init --addons-path=custom_addons --db_host=postgres --db_user=odoo --db_password=odoo -d test_db -i my_module
