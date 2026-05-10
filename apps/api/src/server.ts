@@ -9,6 +9,7 @@ import { errorHandler, notFound } from "./middleware/errorHandler.js";
 // Route imports
 import authRoutes from "./routes/auth.routes.js";
 import tripRoutes from "./routes/trip.routes.js";
+import itineraryRoutes from "./routes/itinerary.routes.js";
 import exploreRoutes from "./routes/explore.routes.js";
 
 const app = express();
@@ -38,6 +39,7 @@ app.get("/api/health", (_req, res) => {
 
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/trips", tripRoutes);
+app.use("/api/v1/trips/:tripId", itineraryRoutes);
 app.use("/api/v1/explore", exploreRoutes);
 
 // ==================== ERROR HANDLING ====================

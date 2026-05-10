@@ -152,6 +152,7 @@ export function TripDetailPage() {
         </div>
         <div className="trip-detail-actions">
           <button className="btn btn-secondary" onClick={() => navigate(`/trips/${id}/edit`)}>✏️ Edit</button>
+          <Link to={`/trips/${id}/builder`} className="btn btn-secondary">🗺️ Builder</Link>
           <button className="btn btn-primary" onClick={() => setShowAddStop(true)}>➕ Add stop</button>
         </div>
       </div>

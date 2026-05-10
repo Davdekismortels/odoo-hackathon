@@ -9,6 +9,7 @@ import { DashboardPage } from "./pages/DashboardPage";
 import { TripListPage } from "./pages/TripListPage";
 import { CreateTripPage } from "./pages/CreateTripPage";
 import { TripDetailPage } from "./pages/TripDetailPage";
+import { BuilderPage } from "./pages/BuilderPage";
 import { useEffect } from "react";
 import { useAuthStore } from "./store/auth.store";
 
@@ -41,6 +42,7 @@ export default function App() {
               <Route path="/trips" element={<TripListPage />} />
               <Route path="/trips/new" element={<CreateTripPage />} />
               <Route path="/trips/:id" element={<TripDetailPage />} />
+              <Route path="/trips/:id/builder" element={<BuilderPage />} />
               <Route path="/explore" element={<div className="page-placeholder">Explore coming soon 🗺️</div>} />
             </Route>
 
