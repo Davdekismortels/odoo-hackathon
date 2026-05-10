@@ -14,6 +14,9 @@ import { PackingPage } from "./pages/PackingPage";
 import { NotesPage } from "./pages/NotesPage";
 import { PublicTripPage } from "./pages/PublicTripPage";
 import { AdminPage } from "./pages/AdminPage";
+import { BudgetPage } from "./pages/BudgetPage";
+import { GeneratorPage } from "./pages/GeneratorPage";
+import { Toaster } from "react-hot-toast";
 import { useEffect } from "react";
 import { useAuthStore } from "./store/auth.store";
 
@@ -30,6 +33,14 @@ function AuthInit({ children }: { children: React.ReactNode }) {
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
+      <Toaster
+        position="bottom-right"
+        toastOptions={{
+          style: { background: "#1e293b", color: "#f1f5f9", border: "1px solid #334155", borderRadius: "10px" },
+          success: { iconTheme: { primary: "#10b981", secondary: "#f1f5f9" } },
+          error: { iconTheme: { primary: "#ef4444", secondary: "#f1f5f9" } },
+        }}
+      />
       <BrowserRouter>
         <AuthInit>
           <Routes>
@@ -49,6 +60,8 @@ export default function App() {
               <Route path="/trips/:id/builder" element={<BuilderPage />} />
               <Route path="/trips/:id/packing" element={<PackingPage />} />
               <Route path="/trips/:id/notes" element={<NotesPage />} />
+              <Route path="/trips/:id/budget" element={<BudgetPage />} />
+              <Route path="/trips/:id/generate" element={<GeneratorPage />} />
               <Route path="/admin" element={<AdminPage />} />
               <Route path="/explore" element={<div className="page-placeholder">Explore coming soon 🗺️</div>} />
             </Route>

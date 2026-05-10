@@ -169,9 +169,11 @@ export function TripDetailPage() {
           </div>
         </div>
         <div className="trip-detail-actions">
+          <Link to={`/trips/${id}/budget`} className="btn btn-secondary">💰 Budget</Link>
           <Link to={`/trips/${id}/packing`} className="btn btn-secondary">🧳 Packing</Link>
           <Link to={`/trips/${id}/notes`} className="btn btn-secondary">📝 Notes</Link>
           <Link to={`/trips/${id}/builder`} className="btn btn-secondary">🗺️ Builder</Link>
+          <Link to={`/trips/${id}/generate`} className="btn btn-primary">🤖 Generate</Link>
           <button
             className="btn btn-secondary"
             onClick={trip.isPublic ? handleUnpublish : handlePublish}

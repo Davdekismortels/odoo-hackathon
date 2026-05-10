@@ -55,4 +55,13 @@ export const itineraryApi = {
 
   removeActivity: (tripId: string, stopId: string, entryId: string) =>
     api.delete(`/trips/${tripId}/stops/${stopId}/activities/${entryId}`),
+
+  updateStop: (tripId: string, stopId: string, data: {
+    accommodationCost?: number;
+    transportCost?: number;
+    mealCostPerDay?: number;
+    accommodation?: string;
+    notes?: string;
+  }) =>
+    api.patch(`/trips/${tripId}/stops/${stopId}`, data).then((r) => (r.data as { data: unknown }).data),
 };

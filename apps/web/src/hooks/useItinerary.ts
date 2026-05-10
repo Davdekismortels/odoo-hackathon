@@ -52,3 +52,17 @@ export function useReorderStops(tripId: string) {
     onSuccess: () => qc.invalidateQueries({ queryKey: ["trips", tripId] }),
   });
 }
+
+export function useUpdateStop(tripId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ stopId, data }: {
+      stopId: string;
+      data: { accommodationCost?: number; transportCost?: number; mealCostPerDay?: number; accommodation?: string; notes?: string };
+    }) => itineraryApi.updateStop(tripId, stopId, data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["trips", tripId] });
+      qc.invalidateQueries({ queryKey: KEYS.budget(tripId) });
+    },
+  });
+}
