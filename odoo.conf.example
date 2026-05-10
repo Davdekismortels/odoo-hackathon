@@ -1,8 +1,0 @@
-[options]
-addons_path = custom_addons
-admin_passwd = admin
-db_host = False
-db_port = False
-db_user = odoo
-db_password = False
-http_port = 8069
