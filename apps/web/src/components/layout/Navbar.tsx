@@ -49,6 +49,9 @@ export function Navbar() {
                       ⚙️ Admin
                     </Link>
                   )}
+                  <Link to="/profile" className="dropdown-item" onClick={() => setMenuOpen(false)}>
+                    👤 Profile & Settings
+                  </Link>
                   <button className="dropdown-item dropdown-item--danger" onClick={handleLogout}>
                     Sign out
                   </button>

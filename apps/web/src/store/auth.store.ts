@@ -7,7 +7,9 @@ export interface AuthUser {
   email: string;
   fullName: string;
   avatarUrl?: string | null;
+  language?: string;
   role: "user" | "admin";
+  createdAt?: string;
 }
 
 interface AuthState {
@@ -23,6 +25,7 @@ interface AuthState {
   logout: () => Promise<void>;
   fetchMe: () => Promise<void>;
   setTokens: (access: string, refresh: string) => void;
+  setUser: (u: Partial<AuthUser>) => void;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -38,6 +41,11 @@ export const useAuthStore = create<AuthState>()(
         localStorage.setItem("accessToken", access);
         localStorage.setItem("refreshToken", refresh);
         set({ accessToken: access, refreshToken: refresh, isAuthenticated: true });
+      },
+
+      setUser: (u) => {
+        const current = get().user;
+        if (current) set({ user: { ...current, ...u } as AuthUser });
       },
 
       signup: async (email, password, fullName) => {

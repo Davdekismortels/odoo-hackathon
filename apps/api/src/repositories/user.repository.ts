@@ -59,3 +59,20 @@ export async function revokeSession(id: string): Promise<void> {
 export async function revokeAllUserSessions(userId: string): Promise<void> {
   db.update(sessions).set({ revoked: true }).where(eq(sessions.userId, userId)).run();
 }
+
+// ==================== PROFILE ====================
+
+export async function updateUser(
+  id: string,
+  data: { fullName?: string; avatarUrl?: string; language?: string }
+): Promise<UserRow | undefined> {
+  db.update(users).set(data).where(eq(users.id, id)).run();
+  return findUserById(id);
+}
+
+export async function softDeleteUser(id: string): Promise<void> {
+  db.update(users)
+    .set({ deletedAt: new Date().toISOString() })
+    .where(eq(users.id, id))
+    .run();
+}

@@ -18,5 +18,7 @@ router.post("/refresh", authController.refresh);
 // Protected routes
 router.post("/logout", requireAuth, authController.logout);
 router.get("/me", requireAuth, authController.me);
+router.patch("/profile", requireAuth, authController.updateProfile);
+router.delete("/account", requireAuth, authController.deleteAccount);
 
 export default router;

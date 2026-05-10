@@ -16,6 +16,8 @@ import { PublicTripPage } from "./pages/PublicTripPage";
 import { AdminPage } from "./pages/AdminPage";
 import { BudgetPage } from "./pages/BudgetPage";
 import { GeneratorPage } from "./pages/GeneratorPage";
+import { ExplorePage } from "./pages/ExplorePage";
+import { ProfilePage } from "./pages/ProfilePage";
 import { Toaster } from "react-hot-toast";
 import { useEffect } from "react";
 import { useAuthStore } from "./store/auth.store";
@@ -63,7 +65,8 @@ export default function App() {
               <Route path="/trips/:id/budget" element={<BudgetPage />} />
               <Route path="/trips/:id/generate" element={<GeneratorPage />} />
               <Route path="/admin" element={<AdminPage />} />
-              <Route path="/explore" element={<div className="page-placeholder">Explore coming soon 🗺️</div>} />
+              <Route path="/explore" element={<ExplorePage />} />
+              <Route path="/profile" element={<ProfilePage />} />
             </Route>
 
             {/* Catch-all */}

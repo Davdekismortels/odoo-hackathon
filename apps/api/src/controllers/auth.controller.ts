@@ -1,6 +1,6 @@
 import type { Request, Response, NextFunction } from "express";
 import * as authService from "../services/auth.service.js";
-import { findUserById } from "../repositories/user.repository.js";
+import { findUserById, updateUser, softDeleteUser } from "../repositories/user.repository.js";
 import type { ApiResponse, User } from "@traveloop/shared";
 
 function getMeta(req: Request) {
@@ -104,6 +104,48 @@ export async function me(req: Request, res: Response, next: NextFunction) {
       createdAt: user.createdAt ?? undefined,
     };
     res.json({ success: true, data: { user: safeUser } });
+  } catch (err) {
+    next(err);
+  }
+}
+
+// PATCH /api/v1/auth/profile
+export async function updateProfile(req: Request, res: Response, next: NextFunction) {
+  try {
+    const { fullName, avatarUrl, language } = req.body as {
+      fullName?: string;
+      avatarUrl?: string;
+      language?: string;
+    };
+    const updated = await updateUser(req.user!.id, { fullName, avatarUrl, language });
+    if (!updated) {
+      res.status(404).json({ success: false, error: { code: "NOT_FOUND", message: "User not found" } });
+      return;
+    }
+    res.json({
+      success: true,
+      data: {
+        user: {
+          id: updated.id,
+          email: updated.email,
+          fullName: updated.fullName,
+          avatarUrl: updated.avatarUrl,
+          language: updated.language ?? "en",
+          role: updated.role,
+        },
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
+// DELETE /api/v1/auth/account
+export async function deleteAccount(req: Request, res: Response, next: NextFunction) {
+  try {
+    await softDeleteUser(req.user!.id);
+    await authService.logout(req.user!.id);
+    res.json({ success: true, data: { message: "Account deleted" } });
   } catch (err) {
     next(err);
   }
