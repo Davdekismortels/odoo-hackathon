@@ -30,12 +30,13 @@
 15. Performance, Caching & Scalability
 16. Testing Strategy
 17. DevOps, Git Workflow & CI/CD
-18. Folder Structure
-19. Sprint Plan & Task Allocation
-20. Demo Script & Pitch Strategy
-21. Risk Register
-22. Future Roadmap
-23. Appendix (Validation Rules, Error Codes, Glossary)
+18. Quick Start (Single Click)
+19. Folder Structure
+20. Sprint Plan & Task Allocation
+21. Demo Script & Pitch Strategy
+22. Risk Register
+23. Future Roadmap
+24. Appendix (Validation Rules, Error Codes, Glossary)
 
 ---
 
@@ -1040,9 +1041,6 @@ pnpm db:migrate && pnpm db:seed
 pnpm dev          # runs web (5173) + api (4000) concurrently
 ```
 
-`README.md` will have this exact, copy-pasteable bootstrap — judges love this.
-
----
 
 ## 18. SPRINT PLAN (48-HOUR HACKATHON)
 

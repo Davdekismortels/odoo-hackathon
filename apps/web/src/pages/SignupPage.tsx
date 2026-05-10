@@ -11,6 +11,7 @@ function validate(form: { email: string; password: string; fullName: string }): 
   if (form.password.length < 8) errors.password = "Password must be at least 8 characters";
   else if (!/[A-Z]/.test(form.password)) errors.password = "Include at least one uppercase letter";
   else if (!/[0-9]/.test(form.password)) errors.password = "Include at least one number";
+  else if (!/[^A-Za-z0-9]/.test(form.password)) errors.password = "Include at least one special character (e.g. !@#$)";
   return errors;
 }
 
@@ -49,8 +50,9 @@ export function SignupPage() {
       await signup(form.email, form.password, form.fullName);
       navigate("/dashboard", { replace: true });
     } catch (err: unknown) {
-      const msg = (err as { response?: { data?: { error?: { message?: string } } } })
-        ?.response?.data?.error?.message ?? "Could not create account, please try again";
+      const errData = (err as { response?: { data?: { error?: { message?: string; details?: { message: string }[] } } } })
+        ?.response?.data?.error;
+      const msg = errData?.details?.[0]?.message ?? errData?.message ?? "Could not create account, please try again";
       setServerError(msg);
     }
   };
@@ -95,7 +97,7 @@ export function SignupPage() {
             <input
               id="password" name="password" type="password"
               autoComplete="new-password" className={`field-input ${fieldErrors.password ? "field-input--error" : ""}`}
-              placeholder="Min. 8 chars with number & uppercase" value={form.password} onChange={handleChange}
+              placeholder="Min. 8 chars · uppercase · number · special (!@#$)" value={form.password} onChange={handleChange}
             />
             {form.password && (
               <div className="strength-bar">

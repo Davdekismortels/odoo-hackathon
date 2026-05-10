@@ -10,7 +10,7 @@ export function validate(schema: ZodSchema) {
         success: false,
         error: {
           code: "VALIDATION_ERROR",
-          message: "Invalid input",
+          message: result.error.issues[0]?.message ?? "Invalid input",
           details: result.error.issues,
         },
       };
