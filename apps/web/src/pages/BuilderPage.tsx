@@ -1,20 +1,7 @@
 import { useState, useCallback } from "react";
 import { useParams, Link } from "react-router-dom";
-import {
-  DndContext,
-  closestCenter,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  type DragEndEvent,
-} from "@dnd-kit/core";
-import {
-  SortableContext,
-  sortableKeyboardCoordinates,
-  verticalListSortingStrategy,
-  arrayMove,
-} from "@dnd-kit/sortable";
+import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, type DragEndEvent } from "@dnd-kit/core";
+import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, arrayMove } from "@dnd-kit/sortable";
 
 import { useTrip } from "../hooks/useTrips";
 import { useBudget, useReorderStops } from "../hooks/useItinerary";
@@ -22,6 +9,7 @@ import { SortableStop } from "../components/builder/SortableStop";
 import { BudgetPanel } from "../components/builder/BudgetPanel";
 import type { Stop } from "../lib/trips.api";
 
+import { getTripHeaderStyle } from "../lib/images";
 
 export function BuilderPage() {
   const { id } = useParams<{ id: string }>();
@@ -32,12 +20,10 @@ export function BuilderPage() {
   const [localStops, setLocalStops] = useState<Stop[]>([]);
   const [initialized, setInitialized] = useState(false);
 
-  // Initialize localStops from server data once
   if (data && !initialized) {
     setLocalStops([...data.stops].sort((a, b) => a.orderIndex - b.orderIndex));
     setInitialized(true);
   }
-  // Sync if server data changes
   if (data && initialized && data.stops.length !== localStops.length) {
     setLocalStops([...data.stops].sort((a, b) => a.orderIndex - b.orderIndex));
   }
@@ -63,7 +49,7 @@ export function BuilderPage() {
   if (isLoading) return <div className="loading-center"><span className="spinner" style={{ width: "2rem", height: "2rem" }} /></div>;
   if (isError || !data) return (
     <div className="empty-state">
-      <p className="empty-state-title">Trip not found</p>
+      <h3 className="empty-state-title">Trip not found</h3>
       <Link to="/trips" className="btn btn-primary">Back to trips</Link>
     </div>
   );
@@ -72,49 +58,36 @@ export function BuilderPage() {
 
   return (
     <div className="builder-page">
-      {/* Header */}
-      <div className="builder-header">
-        <nav className="breadcrumb">
-          <Link to="/trips" className="breadcrumb-link">Trips</Link>
-          <span className="breadcrumb-sep">›</span>
-          <Link to={`/trips/${id}`} className="breadcrumb-link">{trip.name}</Link>
-          <span className="breadcrumb-sep">›</span>
-          <span>Builder</span>
+      <div className="builder-header" style={getTripHeaderStyle(trip.name, trip.id, trip.coverImageUrl)}>
+        <nav className="breadcrumb" style={{ marginBottom: "var(--space-4)" }}>
+          <Link to="/trips" className="breadcrumb-link" style={{ color: "rgba(255,255,255,0.7)" }}>Trips</Link>
+          <span className="breadcrumb-sep" style={{ color: "rgba(255,255,255,0.4)" }}>›</span>
+          <Link to={`/trips/${id}`} className="breadcrumb-link" style={{ color: "rgba(255,255,255,0.7)" }}>{trip.name}</Link>
+          <span className="breadcrumb-sep" style={{ color: "rgba(255,255,255,0.4)" }}>›</span>
+          <span style={{ color: "rgba(255,255,255,0.9)" }}>Builder</span>
         </nav>
         <div className="builder-title-row">
-          <h1 className="builder-title">✈️ Itinerary Builder</h1>
-          <p className="builder-subtitle">Drag stops to reorder · Click to expand and add activities</p>
+          <div>
+            <h1 className="builder-title" style={{ fontSize: "2.5rem", textShadow: "0 2px 20px rgba(0,0,0,0.9)", marginBottom: "var(--space-2)" }}>Itinerary Builder</h1>
+            <p className="builder-subtitle" style={{ fontSize: "1.1rem", color: "rgba(255,255,255,0.9)" }}>Drag stops to reorder · Expand to manage activities</p>
+          </div>
         </div>
       </div>
 
       <div className="builder-layout">
-        {/* Stops column */}
         <section className="builder-stops-col">
           {localStops.length === 0 ? (
             <div className="empty-state">
-              <div className="empty-state-icon">📍</div>
               <h3 className="empty-state-title">No stops yet</h3>
               <p className="empty-state-desc">Add stops from the trip detail page first.</p>
-              <Link to={`/trips/${id}`} className="btn btn-primary">← Trip detail</Link>
+              <Link to={`/trips/${id}`} className="btn btn-primary">Go to Trip Details</Link>
             </div>
           ) : (
-            <DndContext
-              sensors={sensors}
-              collisionDetection={closestCenter}
-              onDragEnd={handleDragEnd}
-            >
-              <SortableContext
-                items={localStops.map((s) => s.id)}
-                strategy={verticalListSortingStrategy}
-              >
+            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+              <SortableContext items={localStops.map((s) => s.id)} strategy={verticalListSortingStrategy}>
                 <div className="builder-stops-list">
                   {localStops.map((stop) => (
-                    <SortableStop
-                      key={stop.id}
-                      tripId={id!}
-                      stop={stop}
-                      currencyCode={trip.currencyCode}
-                    />
+                    <SortableStop key={stop.id} tripId={id!} stop={stop} currencyCode={trip.currencyCode} />
                   ))}
                 </div>
               </SortableContext>
@@ -122,7 +95,6 @@ export function BuilderPage() {
           )}
         </section>
 
-        {/* Budget sidebar */}
         {budget && <BudgetPanel summary={budget} />}
       </div>
     </div>

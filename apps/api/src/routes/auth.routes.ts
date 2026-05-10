@@ -3,7 +3,7 @@ import * as authController from "../controllers/auth.controller.js";
 import { validate } from "../middleware/validate.js";
 import { requireAuth } from "../middleware/auth.js";
 import { authLimiter } from "../middleware/rateLimiter.js";
-import { signupSchema, loginSchema } from "@traveloop/shared";
+import { signupSchema, loginSchema, updateProfileSchema } from "@traveloop/shared";
 
 const router = Router();
 
@@ -18,7 +18,8 @@ router.post("/refresh", authController.refresh);
 // Protected routes
 router.post("/logout", requireAuth, authController.logout);
 router.get("/me", requireAuth, authController.me);
-router.patch("/profile", requireAuth, authController.updateProfile);
+router.patch("/profile", requireAuth, validate(updateProfileSchema), authController.updateProfile);
 router.delete("/account", requireAuth, authController.deleteAccount);
 
 export default router;
+

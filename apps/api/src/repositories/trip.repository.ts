@@ -92,7 +92,9 @@ export function deleteStop(id: string): void {
   db.delete(stops).where(eq(stops.id, id)).run();
 }
 
+import { sql } from "drizzle-orm";
+
 export function countTripStops(tripId: string): number {
-  const result = db.select().from(stops).where(eq(stops.tripId, tripId)).all();
-  return result.length;
+  const result = db.select({ count: sql<number>`count(*)` }).from(stops).where(eq(stops.tripId, tripId)).all();
+  return result[0].count;
 }

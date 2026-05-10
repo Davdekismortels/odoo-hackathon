@@ -8,7 +8,7 @@ export interface PackingItem {
   name: string;
   category: "clothing" | "documents" | "electronics" | "toiletries" | "medication" | "misc";
   quantity: number;
-  isPacked: number; // 0 | 1 (SQLite boolean)
+  isPacked: boolean;
   createdAt: string | null;
 }
 

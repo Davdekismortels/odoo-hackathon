@@ -1,13 +1,16 @@
 import { defineConfig } from "drizzle-kit";
-import { env } from "./src/config/env.js";
+import * as dotenv from "dotenv";
+
+dotenv.config();
 
 export default defineConfig({
   schema: "./src/db/schema.ts",
   out: "./drizzle",
   dialect: "sqlite",
   dbCredentials: {
-    url: env.DATABASE_URL.replace("file:", ""),
+    url: (process.env.DATABASE_URL || "file:./traveloop.db").replace("file:", ""),
   },
   verbose: true,
   strict: true,
 });
+

@@ -1,5 +1,5 @@
 import { eq } from "drizzle-orm";
-import { db } from "../db/index.js";
+import { db, getRawDb } from "../db/index.js";
 import { stopActivities, activities } from "../db/schema.js";
 
 export type StopActivityRow = typeof stopActivities.$inferSelect;
@@ -53,7 +53,6 @@ export function removeActivityFromStop(id: string): void {
 
 /** Update the orderIndex of multiple stops (for drag-drop reorder) */
 export function reorderStops(updates: Array<{ id: string; orderIndex: number }>): void {
-  const { getRawDb } = require("../db/index.js");
   const raw = getRawDb();
   const stmt = raw.prepare("UPDATE stops SET order_index = ? WHERE id = ?");
   const runAll = raw.transaction((rows: Array<{ id: string; orderIndex: number }>) => {

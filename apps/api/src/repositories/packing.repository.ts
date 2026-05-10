@@ -53,3 +53,11 @@ export function deletePackingItem(id: string, tripId: string): void {
     .where(and(eq(packingItems.id, id), eq(packingItems.tripId, tripId)))
     .run();
 }
+
+/** Bulk reset: mark ALL items for a trip as unpacked in a single SQL UPDATE */
+export function resetAllPackingItems(tripId: string): void {
+  db.update(packingItems)
+    .set({ isPacked: false })
+    .where(eq(packingItems.tripId, tripId))
+    .run();
+}

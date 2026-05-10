@@ -3,6 +3,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./lib/queryClient";
 import { AppShell } from "./components/layout/AppShell";
 import { ProtectedRoute, GuestRoute } from "./components/layout/ProtectedRoute";
+import { ErrorBoundary } from "./components/layout/ErrorBoundary";
 import { LoginPage } from "./pages/LoginPage";
 import { SignupPage } from "./pages/SignupPage";
 import { DashboardPage } from "./pages/DashboardPage";
@@ -23,59 +24,64 @@ import { useEffect } from "react";
 import { useAuthStore } from "./store/auth.store";
 
 function AuthInit({ children }: { children: React.ReactNode }) {
-  const { fetchMe, isAuthenticated } = useAuthStore();
+  const fetchMe = useAuthStore((s) => s.fetchMe);
   useEffect(() => {
-    // On app load, if we have a token stored, rehydrate user from /me
+    // On app load, rehydrate user from /me if an access token exists in storage.
+    // We select fetchMe directly (not the whole store) so the effect has a stable dep.
     const token = localStorage.getItem("accessToken");
-    if (token && isAuthenticated) fetchMe();
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    if (token) fetchMe();
+  }, [fetchMe]);
   return <>{children}</>;
 }
 
+
 export default function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <Toaster
-        position="bottom-right"
-        toastOptions={{
-          style: { background: "#1e293b", color: "#f1f5f9", border: "1px solid #334155", borderRadius: "10px" },
-          success: { iconTheme: { primary: "#10b981", secondary: "#f1f5f9" } },
-          error: { iconTheme: { primary: "#ef4444", secondary: "#f1f5f9" } },
-        }}
-      />
-      <BrowserRouter>
-        <AuthInit>
-          <Routes>
-            {/* Public redirects */}
-            <Route path="/" element={<Navigate to="/dashboard" replace />} />
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <Toaster
+          position="bottom-right"
+          toastOptions={{
+            style: { background: "#1e293b", color: "#f1f5f9", border: "1px solid #334155", borderRadius: "10px" },
+            success: { iconTheme: { primary: "#10b981", secondary: "#f1f5f9" } },
+            error: { iconTheme: { primary: "#ef4444", secondary: "#f1f5f9" } },
+          }}
+        />
+        <BrowserRouter>
+          <AuthInit>
+            <Routes>
+              {/* Public redirects */}
+              <Route path="/" element={<Navigate to="/dashboard" replace />} />
 
-            {/* Guest-only routes (redirect if already logged in) */}
-            <Route path="/login" element={<GuestRoute><LoginPage /></GuestRoute>} />
-            <Route path="/signup" element={<GuestRoute><SignupPage /></GuestRoute>} />
+              {/* Guest-only routes (redirect if already logged in) */}
+              <Route path="/login" element={<GuestRoute><LoginPage /></GuestRoute>} />
+              <Route path="/signup" element={<GuestRoute><SignupPage /></GuestRoute>} />
 
-            {/* Protected app routes */}
-            <Route element={<ProtectedRoute><AppShell /></ProtectedRoute>}>
-              <Route path="/dashboard" element={<DashboardPage />} />
-              <Route path="/trips" element={<TripListPage />} />
-              <Route path="/trips/new" element={<CreateTripPage />} />
-              <Route path="/trips/:id" element={<TripDetailPage />} />
-              <Route path="/trips/:id/builder" element={<BuilderPage />} />
-              <Route path="/trips/:id/packing" element={<PackingPage />} />
-              <Route path="/trips/:id/notes" element={<NotesPage />} />
-              <Route path="/trips/:id/budget" element={<BudgetPage />} />
-              <Route path="/trips/:id/generate" element={<GeneratorPage />} />
-              <Route path="/admin" element={<AdminPage />} />
-              <Route path="/explore" element={<ExplorePage />} />
-              <Route path="/profile" element={<ProfilePage />} />
-            </Route>
+              {/* Protected app routes */}
+              <Route element={<ProtectedRoute><AppShell /></ProtectedRoute>}>
+                <Route path="/dashboard" element={<DashboardPage />} />
+                <Route path="/trips" element={<TripListPage />} />
+                <Route path="/trips/new" element={<CreateTripPage />} />
+                <Route path="/trips/:id" element={<TripDetailPage />} />
+                <Route path="/trips/:id/builder" element={<BuilderPage />} />
+                <Route path="/trips/:id/packing" element={<PackingPage />} />
+                <Route path="/trips/:id/notes" element={<NotesPage />} />
+                <Route path="/trips/:id/budget" element={<BudgetPage />} />
+                <Route path="/trips/:id/generate" element={<GeneratorPage />} />
+                <Route path="/admin" element={<AdminPage />} />
+                <Route path="/explore" element={<ExplorePage />} />
+                <Route path="/profile" element={<ProfilePage />} />
+              </Route>
 
-            {/* Catch-all */}
-            {/* Public itinerary — no auth needed */}
-            <Route path="/p/:slug" element={<PublicTripPage />} />
-            <Route path="*" element={<Navigate to="/dashboard" replace />} />
-          </Routes>
-        </AuthInit>
-      </BrowserRouter>
-    </QueryClientProvider>
+              {/* Public itinerary — no auth needed */}
+              <Route path="/p/:slug" element={<PublicTripPage />} />
+              {/* Catch-all */}
+              <Route path="*" element={<Navigate to="/dashboard" replace />} />
+            </Routes>
+          </AuthInit>
+        </BrowserRouter>
+      </QueryClientProvider>
+    </ErrorBoundary>
   );
 }
+

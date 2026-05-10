@@ -57,8 +57,11 @@ export function getBudgetSummary(tripId: string, userId: string) {
   let totalActivities = 0;
 
   const stopBreakdowns = stops.map((stop) => {
+    // Parse date-only strings as UTC midnight to avoid DST-caused rounding errors
+    const arrivalMs  = stop.arrivalDate   ? Date.UTC(...(stop.arrivalDate.split("-").map(Number)   as [number, number, number])) : 0;
+    const departMs   = stop.departureDate ? Date.UTC(...(stop.departureDate.split("-").map(Number)  as [number, number, number])) : 0;
     const nights = stop.arrivalDate && stop.departureDate
-      ? Math.max(0, Math.round((new Date(stop.departureDate).getTime() - new Date(stop.arrivalDate).getTime()) / 86400000))
+      ? Math.max(0, Math.round((departMs - arrivalMs) / 86_400_000))
       : 0;
 
     const accom = (stop.accommodationCost ?? 0) * nights;

@@ -47,12 +47,10 @@ export function removeItem(tripId: string, userId: string, itemId: string) {
   packingRepo.deletePackingItem(itemId, tripId);
 }
 
-// Reset — unpack all items for a trip
+// Reset — unpack all items for a trip in a single SQL UPDATE
 export function resetItems(tripId: string, userId: string) {
   assertTripOwner(tripId, userId);
-  const items = packingRepo.findPackingItems(tripId);
-  for (const item of items) {
-    packingRepo.updatePackingItem(item.id, tripId, { isPacked: false });
-  }
+  packingRepo.resetAllPackingItems(tripId);
   return listItems(tripId, userId);
 }
+

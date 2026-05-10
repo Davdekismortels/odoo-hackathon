@@ -57,6 +57,15 @@ export const updateTripSchema = z.object({
   status: z.enum(["planning", "booked", "completed", "archived"]).optional(),
 });
 
+// ==================== PROFILE SCHEMAS ====================
+
+export const updateProfileSchema = z.object({
+  fullName: z.string().min(2).max(120).trim().optional(),
+  avatarUrl: z.string().url().optional().nullable(),
+  language: z.string().min(2).max(10).optional(),
+});
+
+
 // ==================== STOP SCHEMAS ====================
 
 export const createStopSchema = z
@@ -126,9 +135,11 @@ export type SignupInput = z.infer<typeof signupSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
 export type CreateTripInput = z.infer<typeof createTripSchema>;
 export type UpdateTripInput = z.infer<typeof updateTripSchema>;
+export type UpdateProfileInput = z.infer<typeof updateProfileSchema>;
 export type CreateStopInput = z.infer<typeof createStopSchema>;
 export type AddActivityToStopInput = z.infer<typeof addActivityToStopSchema>;
 export type CreateBudgetEntryInput = z.infer<typeof createBudgetEntrySchema>;
 export type CreatePackingItemInput = z.infer<typeof createPackingItemSchema>;
 export type CreateNoteInput = z.infer<typeof createNoteSchema>;
 export type CitySearchInput = z.infer<typeof citySearchSchema>;
+

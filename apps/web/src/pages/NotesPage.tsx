@@ -4,41 +4,37 @@ import { useTrip } from "../hooks/useTrips";
 import { useNotes, useAddNote, useEditNote, useRemoveNote } from "../hooks/usePackingNotes";
 import type { TripNote } from "../lib/packing-notes.api";
 
-function NoteCard({
-  note,
-  tripId,
-  onEdit,
-}: {
-  note: TripNote;
-  tripId: string;
-  onEdit: (note: TripNote) => void;
-}) {
+import { Pencil, X } from "lucide-react";
+
+const EditIcon = () => <Pencil size={12} strokeWidth={2.5} />;
+const XIcon = () => <X size={16} strokeWidth={2.5} />;
+
+function NoteCard({ note, tripId, onEdit }: { note: TripNote; tripId: string; onEdit: (n: TripNote) => void }) {
   const remove = useRemoveNote(tripId);
+  const fmt = (d: string) => new Date(d).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
   return (
     <div className="note-card">
       <div className="note-card-header">
-        <h3 className="note-card-title">{note.title || "Untitled note"}</h3>
+        <h3 className="note-card-title">{note.title || "Untitled"}</h3>
         <div className="note-card-actions">
-          <button className="btn-ghost-sm" onClick={() => onEdit(note)}>✏️ Edit</button>
-          <button
-            className="btn-ghost-sm btn-danger"
-            onClick={() => remove.mutate(note.id)}
-            disabled={remove.isPending}
-          >✕</button>
+          <button className="btn-ghost-sm" onClick={() => onEdit(note)} title="Edit"><EditIcon /></button>
+          <button className="btn-ghost-sm" onClick={() => remove.mutate(note.id)} disabled={remove.isPending} title="Delete">
+            {remove.isPending ? <span className="spinner" style={{ width: "0.7rem", height: "0.7rem" }} /> : <XIcon />}
+          </button>
         </div>
       </div>
       <div className="note-card-body">
-        {/* Simple markdown-like rendering: split on newlines */}
-        {note.body.split("\n").map((line, i) => (
+        {note.body.split("\n").slice(0, 6).map((line, i) => (
           <p key={i} className="note-body-line">{line || "\u00a0"}</p>
         ))}
+        {note.body.split("\n").length > 6 && <p className="note-body-line" style={{ color: "var(--color-text-faint)" }}>…</p>}
       </div>
-      {note.createdAt && (
-        <p className="note-card-date">{new Date(note.createdAt).toLocaleDateString()}</p>
-      )}
+      {note.createdAt && <p className="note-card-date">{fmt(note.createdAt)}</p>}
     </div>
   );
 }
+
+import { getTripHeaderStyle } from "../lib/images";
 
 export function NotesPage() {
   const { id: tripId } = useParams<{ id: string }>();
@@ -51,17 +47,9 @@ export function NotesPage() {
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ title: "", body: "" });
 
-  const openNew = () => {
-    setEditing(null);
-    setForm({ title: "", body: "" });
-    setShowForm(true);
-  };
-
-  const openEdit = (note: TripNote) => {
-    setEditing(note);
-    setForm({ title: note.title ?? "", body: note.body });
-    setShowForm(true);
-  };
+  const openNew = () => { setEditing(null); setForm({ title: "", body: "" }); setShowForm(true); };
+  const openEdit = (note: TripNote) => { setEditing(note); setForm({ title: note.title ?? "", body: note.body }); setShowForm(true); };
+  const closeForm = () => { setShowForm(false); setEditing(null); setForm({ title: "", body: "" }); };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -71,62 +59,53 @@ export function NotesPage() {
     } else {
       await addNote.mutateAsync({ title: form.title || undefined, body: form.body });
     }
-    setShowForm(false);
-    setForm({ title: "", body: "" });
-    setEditing(null);
+    closeForm();
   };
+
+  const isPending = addNote.isPending || editNote.isPending;
+  const trip = tripData?.trip;
 
   return (
     <div className="notes-page">
-      {/* Header */}
-      <div className="page-header">
+      <div className="page-header" style={{ ...(trip ? getTripHeaderStyle(trip.name, trip.id, trip.coverImageUrl) : {}), display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <div>
-          <nav className="breadcrumb">
-            <Link to="/trips" className="breadcrumb-link">Trips</Link>
-            <span className="breadcrumb-sep">›</span>
-            <Link to={`/trips/${tripId}`} className="breadcrumb-link">{tripData?.trip.name ?? "Trip"}</Link>
-            <span className="breadcrumb-sep">›</span>
-            <span>Notes</span>
+          <nav className="breadcrumb" style={{ marginBottom: "var(--space-4)" }}>
+            <Link to="/trips" className="breadcrumb-link" style={{ color: "rgba(255,255,255,0.7)" }}>Trips</Link>
+            <span className="breadcrumb-sep" style={{ color: "rgba(255,255,255,0.4)" }}>›</span>
+            <Link to={`/trips/${tripId}`} className="breadcrumb-link" style={{ color: "rgba(255,255,255,0.7)" }}>{trip?.name ?? "Trip"}</Link>
+            <span className="breadcrumb-sep" style={{ color: "rgba(255,255,255,0.4)" }}>›</span>
+            <span style={{ color: "rgba(255,255,255,0.9)" }}>Notes</span>
           </nav>
-          <h1 className="page-title">📝 Trip Notes</h1>
-          <p className="page-subtitle">{notes.length} note{notes.length !== 1 ? "s" : ""}</p>
+          <h1 className="page-title" style={{ fontSize: "2.5rem", textShadow: "0 2px 20px rgba(0,0,0,0.9)", marginBottom: "var(--space-2)" }}>Trip Notes</h1>
+          <p className="page-subtitle" style={{ fontSize: "1.1rem", color: "rgba(255,255,255,0.9)" }}>{notes.length} note{notes.length !== 1 ? "s" : ""}</p>
         </div>
-        <button className="btn btn-primary" onClick={openNew}>+ New Note</button>
+        <button className="btn btn-primary" onClick={openNew}>+ New note</button>
       </div>
 
-      {/* Editor form */}
+      {/* Modal editor */}
       {showForm && (
-        <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && setShowForm(false)}>
+        <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && closeForm()}>
           <div className="modal">
             <div className="modal-header">
               <h2 className="modal-title">{editing ? "Edit Note" : "New Note"}</h2>
-              <button className="modal-close btn-ghost-sm" onClick={() => setShowForm(false)}>✕</button>
+              <button className="btn-ghost-sm modal-close" onClick={closeForm}><XIcon /></button>
             </div>
             <form onSubmit={handleSubmit} className="modal-form">
               <div className="field">
-                <label className="field-label">Title (optional)</label>
-                <input
-                  className="field-input"
-                  placeholder="e.g. Hotel recommendations"
-                  value={form.title}
-                  onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
-                />
+                <label className="field-label">Title <span style={{ color: "var(--color-text-faint)" }}>(optional)</span></label>
+                <input className="field-input" placeholder="e.g. Hotel recommendations"
+                  value={form.title} onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))} />
               </div>
               <div className="field">
                 <label className="field-label">Body</label>
-                <textarea
-                  className="field-input field-textarea note-textarea"
-                  placeholder="Write your note here..."
-                  value={form.body}
-                  onChange={(e) => setForm((f) => ({ ...f, body: e.target.value }))}
-                  required
-                  rows={10}
-                />
+                <textarea className="field-input field-textarea note-textarea"
+                  placeholder="Write your note here…" required rows={10}
+                  value={form.body} onChange={(e) => setForm((f) => ({ ...f, body: e.target.value }))} />
               </div>
               <div className="form-actions">
-                <button type="button" className="btn btn-secondary" onClick={() => setShowForm(false)}>Cancel</button>
-                <button type="submit" className="btn btn-primary" disabled={addNote.isPending || editNote.isPending}>
-                  {addNote.isPending || editNote.isPending ? <span className="spinner" /> : editing ? "Save" : "Create"}
+                <button type="button" className="btn btn-secondary" onClick={closeForm}>Cancel</button>
+                <button type="submit" className="btn btn-primary" disabled={isPending}>
+                  {isPending ? <span className="spinner" /> : editing ? "Save changes" : "Create note"}
                 </button>
               </div>
             </form>
@@ -134,21 +113,17 @@ export function NotesPage() {
         </div>
       )}
 
-      {/* Notes grid */}
       {isLoading ? (
         <div className="loading-center"><span className="spinner" style={{ width: "2rem", height: "2rem" }} /></div>
       ) : notes.length === 0 ? (
         <div className="empty-state">
-          <div className="empty-state-icon">📝</div>
           <h3 className="empty-state-title">No notes yet</h3>
-          <p className="empty-state-desc">Create your first note to jot down ideas, reminders, or tips.</p>
-          <button className="btn btn-primary" onClick={openNew}>+ New Note</button>
+          <p className="empty-state-desc">Jot down ideas, reminders, hotel picks, or local tips for this trip.</p>
+          <button className="btn btn-primary" onClick={openNew}>+ Create first note</button>
         </div>
       ) : (
         <div className="notes-grid">
-          {notes.map((note) => (
-            <NoteCard key={note.id} note={note} tripId={tripId!} onEdit={openEdit} />
-          ))}
+          {notes.map((note) => <NoteCard key={note.id} note={note} tripId={tripId!} onEdit={openEdit} />)}
         </div>
       )}
     </div>

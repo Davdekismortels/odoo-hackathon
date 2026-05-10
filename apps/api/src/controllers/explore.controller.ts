@@ -1,54 +1,53 @@
-import { eq, like, desc } from "drizzle-orm";
-import type { Request, Response, NextFunction } from "express";
+import { eq, like, and, desc } from "drizzle-orm";
+import type { Request, Response } from "express";
 import { db } from "../db/index.js";
 import { cities, countries, activities } from "../db/schema.js";
+import { asyncHandler } from "../middleware/asyncHandler.js";
 
-// GET /api/v1/cities?q=&country=
-export function searchCities(req: Request, res: Response, next: NextFunction) {
-  try {
-    const q = String(req.query.q ?? "");
-    const country = String(req.query.country ?? "");
-    const limit = Math.min(Number(req.query.limit ?? 20), 50);
+// GET /api/v1/cities?q=&country=&limit=
+export const searchCities = asyncHandler(async (req: Request, res: Response) => {
+  const q = String(req.query.q ?? "").trim();
+  const country = String(req.query.country ?? "").trim();
+  const limit = Math.min(Number(req.query.limit ?? 20), 50);
 
-    let query = db
-      .select({
-        id: cities.id,
-        name: cities.name,
-        countryCode: cities.countryCode,
-        latitude: cities.latitude,
-        longitude: cities.longitude,
-        description: cities.description,
-        imageUrl: cities.imageUrl,
-        popularity: cities.popularity,
-      })
-      .from(cities);
+  // Build SQL-level filter conditions — never load all rows into memory
+  const conditions = [];
+  if (q) conditions.push(like(cities.name, `%${q}%`));
+  if (country) conditions.push(eq(cities.countryCode, country));
 
-    const results = query.all().filter((c) => {
-      const matchesQ = !q || c.name.toLowerCase().includes(q.toLowerCase());
-      const matchesCountry = !country || c.countryCode === country;
-      return matchesQ && matchesCountry;
-    }).slice(0, limit);
+  const results = db
+    .select({
+      id: cities.id,
+      name: cities.name,
+      countryCode: cities.countryCode,
+      latitude: cities.latitude,
+      longitude: cities.longitude,
+      description: cities.description,
+      imageUrl: cities.imageUrl,
+      popularity: cities.popularity,
+    })
+    .from(cities)
+    .where(conditions.length > 0 ? and(...conditions) : undefined)
+    .orderBy(desc(cities.popularity))
+    .limit(limit)
+    .all();
 
-    res.json({ success: true, data: { cities: results } });
-  } catch (err) { next(err); }
-}
+  res.json({ success: true, data: { cities: results } });
+});
+
 
 // GET /api/v1/cities/:id/activities
-export function getCityActivities(req: Request, res: Response, next: NextFunction) {
-  try {
-    const results = db
-      .select()
-      .from(activities)
-      .where(eq(activities.cityId, String(req.params.id)))
-      .all();
-    res.json({ success: true, data: { activities: results } });
-  } catch (err) { next(err); }
-}
+export const getCityActivities = asyncHandler(async (req: Request, res: Response) => {
+  const results = db
+    .select()
+    .from(activities)
+    .where(eq(activities.cityId, String(req.params.id)))
+    .all();
+  res.json({ success: true, data: { activities: results } });
+});
 
 // GET /api/v1/countries
-export function listCountries(req: Request, res: Response, next: NextFunction) {
-  try {
-    const results = db.select().from(countries).all();
-    res.json({ success: true, data: { countries: results } });
-  } catch (err) { next(err); }
-}
+export const listCountries = asyncHandler(async (req: Request, res: Response) => {
+  const results = db.select().from(countries).all();
+  res.json({ success: true, data: { countries: results } });
+});

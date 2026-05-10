@@ -63,24 +63,36 @@ export function getPublicTripData(slug: string) {
     .orderBy(stops.orderIndex)
     .all();
 
-  const stopsWithActivities = tripStops.map((stop) => {
-    const acts = db
-      .select({
-        id: stopActivities.id,
-        activityId: stopActivities.activityId,
-        scheduledDate: stopActivities.scheduledDate,
-        customCost: stopActivities.customCost,
-        activityName: activities.name,
-        activityCategory: activities.category,
-        estimatedCost: activities.estimatedCost,
-        durationMin: activities.durationMin,
-      })
-      .from(stopActivities)
-      .leftJoin(activities, eq(stopActivities.activityId, activities.id))
-      .where(eq(stopActivities.stopId, stop.id))
-      .all();
-    return { ...stop, activities: acts };
-  });
+  // Fetch ALL activities for this trip in ONE query (eliminates N+1)
+  const stopIds = tripStops.map((s) => s.id);
+  const allActivities = stopIds.length === 0 ? [] : db
+    .select({
+      id: stopActivities.id,
+      stopId: stopActivities.stopId,
+      activityId: stopActivities.activityId,
+      scheduledDate: stopActivities.scheduledDate,
+      customCost: stopActivities.customCost,
+      activityName: activities.name,
+      activityCategory: activities.category,
+      estimatedCost: activities.estimatedCost,
+      durationMin: activities.durationMin,
+    })
+    .from(stopActivities)
+    .leftJoin(activities, eq(stopActivities.activityId, activities.id))
+    .all();
+
+  // Group activities by stopId in memory
+  const actsByStop = new Map<string, typeof allActivities>();
+  for (const act of allActivities) {
+    const group = actsByStop.get(act.stopId) ?? [];
+    group.push(act);
+    actsByStop.set(act.stopId, group);
+  }
+
+  const stopsWithActivities = tripStops.map((stop) => ({
+    ...stop,
+    activities: actsByStop.get(stop.id) ?? [],
+  }));
 
   return { pub, trip, stops: stopsWithActivities };
 }

@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE_URL = import.meta.env.VITE_API_URL ?? "http://localhost:4000/api/v1";
+const BASE_URL = import.meta.env.VITE_API_URL ?? "/api/v1";
 
 export const api = axios.create({
   baseURL: BASE_URL,
@@ -16,15 +16,32 @@ api.interceptors.request.use((config) => {
 });
 
 // ── Response interceptor: refresh on 401 ──────────────────────────────────
-let isRefreshing = false;
-let pendingQueue: Array<{ resolve: (t: string) => void; reject: (e: unknown) => void }> = [];
+// A single shared refresh promise that all concurrent 401s await,
+// preventing duplicate refresh calls and token invalidation.
+let refreshPromise: Promise<string> | null = null;
 
-function processQueue(token: string | null, error: unknown = null) {
-  pendingQueue.forEach(({ resolve, reject }) => {
-    if (token) resolve(token);
-    else reject(error);
+function getRefreshedToken(): Promise<string> {
+  if (refreshPromise) return refreshPromise;
+
+  refreshPromise = (async () => {
+    const refreshToken = localStorage.getItem("refreshToken");
+    if (!refreshToken) throw new Error("No refresh token");
+
+    const { data } = await axios.post(`${BASE_URL}/auth/refresh`, { refreshToken });
+    const newAccess: string = data.data.accessToken;
+    const newRefresh: string = data.data.refreshToken;
+
+    localStorage.setItem("accessToken", newAccess);
+    localStorage.setItem("refreshToken", newRefresh);
+    api.defaults.headers.common.Authorization = `Bearer ${newAccess}`;
+
+    return newAccess;
+  })().finally(() => {
+    // Always clear so the next expiry triggers a fresh refresh
+    refreshPromise = null;
   });
-  pendingQueue = [];
+
+  return refreshPromise;
 }
 
 api.interceptors.response.use(
@@ -36,42 +53,18 @@ api.interceptors.response.use(
       return Promise.reject(error);
     }
 
-    if (isRefreshing) {
-      return new Promise((resolve, reject) => {
-        pendingQueue.push({ resolve, reject });
-      }).then((token) => {
-        original.headers.Authorization = `Bearer ${token}`;
-        return api(original);
-      });
-    }
-
     original._retry = true;
-    isRefreshing = true;
 
     try {
-      const refreshToken = localStorage.getItem("refreshToken");
-      if (!refreshToken) throw new Error("No refresh token");
-
-      const { data } = await axios.post(`${BASE_URL}/auth/refresh`, { refreshToken });
-      const newAccess: string = data.data.accessToken;
-      const newRefresh: string = data.data.refreshToken;
-
-      localStorage.setItem("accessToken", newAccess);
-      localStorage.setItem("refreshToken", newRefresh);
-
-      api.defaults.headers.common.Authorization = `Bearer ${newAccess}`;
-      processQueue(newAccess);
-
-      original.headers.Authorization = `Bearer ${newAccess}`;
+      const newToken = await getRefreshedToken();
+      original.headers.Authorization = `Bearer ${newToken}`;
       return api(original);
     } catch (err) {
-      processQueue(null, err);
       localStorage.removeItem("accessToken");
       localStorage.removeItem("refreshToken");
       window.location.href = "/login";
       return Promise.reject(err);
-    } finally {
-      isRefreshing = false;
     }
   }
 );
+

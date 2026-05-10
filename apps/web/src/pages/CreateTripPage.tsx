@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useCreateTrip } from "../hooks/useTrips";
+import { getTripHeaderStyle } from "../lib/images";
 
 const CURRENCIES = ["USD", "EUR", "GBP", "JPY", "INR", "AUD", "CAD", "SGD", "AED"];
 
@@ -71,9 +72,14 @@ export function CreateTripPage() {
       </nav>
 
       <div className="form-card">
-        <div className="form-card-header">
-          <h1 className="form-card-title">Plan a new trip ✈️</h1>
-          <p className="form-card-subtitle">Fill in the basics — you can add stops and activities after.</p>
+        <div className="form-card-header" style={{
+          ...getTripHeaderStyle("Create Trip", "new_trip", null),
+          padding: "var(--space-8) var(--space-6)",
+          margin: "-var(--space-6) -var(--space-6) var(--space-6) -var(--space-6)",
+          borderRadius: "var(--radius-xl) var(--radius-xl) 0 0",
+        }}>
+          <h1 className="form-card-title" style={{ fontSize: "2.2rem", textShadow: "0 2px 10px rgba(0,0,0,0.5)", marginBottom: "var(--space-2)", color: "#fff" }}>Plan a new trip ✈️</h1>
+          <p className="form-card-subtitle" style={{ fontSize: "1.05rem", color: "rgba(255,255,255,0.8)" }}>Fill in the basics — you can add stops and activities after.</p>
         </div>
 
         <form onSubmit={handleSubmit} className="trip-form">
