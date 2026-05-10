@@ -6,6 +6,9 @@ import { ProtectedRoute, GuestRoute } from "./components/layout/ProtectedRoute";
 import { LoginPage } from "./pages/LoginPage";
 import { SignupPage } from "./pages/SignupPage";
 import { DashboardPage } from "./pages/DashboardPage";
+import { TripListPage } from "./pages/TripListPage";
+import { CreateTripPage } from "./pages/CreateTripPage";
+import { TripDetailPage } from "./pages/TripDetailPage";
 import { useEffect } from "react";
 import { useAuthStore } from "./store/auth.store";
 
@@ -35,8 +38,9 @@ export default function App() {
             {/* Protected app routes */}
             <Route element={<ProtectedRoute><AppShell /></ProtectedRoute>}>
               <Route path="/dashboard" element={<DashboardPage />} />
-              {/* Chunk 4+ routes will be added here */}
-              <Route path="/trips" element={<div className="page-placeholder">Trips coming in Chunk 4 ✈️</div>} />
+              <Route path="/trips" element={<TripListPage />} />
+              <Route path="/trips/new" element={<CreateTripPage />} />
+              <Route path="/trips/:id" element={<TripDetailPage />} />
               <Route path="/explore" element={<div className="page-placeholder">Explore coming soon 🗺️</div>} />
             </Route>
 
