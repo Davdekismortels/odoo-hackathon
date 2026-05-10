@@ -1,7 +1,9 @@
-import { db, sqlite } from "./index.js";
+import { db, getRawDb } from "./index.js";
 import { sql } from "drizzle-orm";
 
 console.log("🗄️  Running migrations...\n");
+
+const sqlite = getRawDb();
 
 // Create all tables using raw SQL (Drizzle push approach for SQLite)
 sqlite.exec(`

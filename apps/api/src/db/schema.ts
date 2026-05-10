@@ -17,9 +17,9 @@ export const users = sqliteTable("users", {
   createdAt: text("created_at").default(sql`(datetime('now'))`),
   updatedAt: text("updated_at").default(sql`(datetime('now'))`),
   deletedAt: text("deleted_at"),
-}, (table) => [
-  index("idx_users_email").on(table.email),
-]);
+}, (table) => ({
+  emailIdx: index("idx_users_email").on(table.email),
+}));
 
 // ==================== 2. COUNTRIES ====================
 export const countries = sqliteTable("countries", {
@@ -46,10 +46,10 @@ export const cities = sqliteTable("cities", {
   description: text("description"),
   imageUrl: text("image_url"),
   createdAt: text("created_at").default(sql`(datetime('now'))`),
-}, (table) => [
-  index("idx_cities_country").on(table.countryCode),
-  index("idx_cities_name").on(table.name),
-]);
+}, (table) => ({
+  countryIdx: index("idx_cities_country").on(table.countryCode),
+  nameIdx: index("idx_cities_name").on(table.name),
+}));
 
 // ==================== 4. ACTIVITIES ====================
 export const activities = sqliteTable("activities", {
@@ -67,10 +67,10 @@ export const activities = sqliteTable("activities", {
   source: text("source", { enum: ["osm", "user", "seed"] }).default("seed"),
   createdBy: text("created_by").references(() => users.id),
   createdAt: text("created_at").default(sql`(datetime('now'))`),
-}, (table) => [
-  index("idx_activities_city").on(table.cityId),
-  index("idx_activities_category").on(table.category),
-]);
+}, (table) => ({
+  cityIdx: index("idx_activities_city").on(table.cityId),
+  categoryIdx: index("idx_activities_category").on(table.category),
+}));
 
 // ==================== 5. TRIPS ====================
 export const trips = sqliteTable("trips", {
@@ -88,10 +88,10 @@ export const trips = sqliteTable("trips", {
   createdAt: text("created_at").default(sql`(datetime('now'))`),
   updatedAt: text("updated_at").default(sql`(datetime('now'))`),
   deletedAt: text("deleted_at"),
-}, (table) => [
-  index("idx_trips_user").on(table.userId),
-  index("idx_trips_public").on(table.isPublic),
-]);
+}, (table) => ({
+  userIdx: index("idx_trips_user").on(table.userId),
+  publicIdx: index("idx_trips_public").on(table.isPublic),
+}));
 
 // ==================== 6. STOPS ====================
 export const stops = sqliteTable("stops", {
@@ -107,9 +107,9 @@ export const stops = sqliteTable("stops", {
   mealCostPerDay: real("meal_cost_per_day").default(0),
   notes: text("notes"),
   createdAt: text("created_at").default(sql`(datetime('now'))`),
-}, (table) => [
-  index("idx_stops_trip").on(table.tripId, table.orderIndex),
-]);
+}, (table) => ({
+  tripOrderIdx: index("idx_stops_trip").on(table.tripId, table.orderIndex),
+}));
 
 // ==================== 7. STOP_ACTIVITIES (junction) ====================
 export const stopActivities = sqliteTable("stop_activities", {
@@ -121,9 +121,9 @@ export const stopActivities = sqliteTable("stop_activities", {
   customCost: real("custom_cost"),
   notes: text("notes"),
   orderIndex: integer("order_index").default(0),
-}, (table) => [
-  index("idx_stop_act_stop").on(table.stopId),
-]);
+}, (table) => ({
+  stopIdx: index("idx_stop_act_stop").on(table.stopId),
+}));
 
 // ==================== 8. BUDGET_ENTRIES ====================
 export const budgetEntries = sqliteTable("budget_entries", {
@@ -136,9 +136,9 @@ export const budgetEntries = sqliteTable("budget_entries", {
   description: text("description"),
   entryDate: text("entry_date"),
   createdAt: text("created_at").default(sql`(datetime('now'))`),
-}, (table) => [
-  index("idx_budget_trip").on(table.tripId),
-]);
+}, (table) => ({
+  tripIdx: index("idx_budget_trip").on(table.tripId),
+}));
 
 // ==================== 9. PACKING_ITEMS ====================
 export const packingItems = sqliteTable("packing_items", {
@@ -149,9 +149,9 @@ export const packingItems = sqliteTable("packing_items", {
   isPacked: integer("is_packed", { mode: "boolean" }).default(false),
   quantity: integer("quantity").default(1),
   createdAt: text("created_at").default(sql`(datetime('now'))`),
-}, (table) => [
-  index("idx_packing_trip").on(table.tripId),
-]);
+}, (table) => ({
+  tripIdx: index("idx_packing_trip").on(table.tripId),
+}));
 
 // ==================== 10. TRIP_NOTES ====================
 export const tripNotes = sqliteTable("trip_notes", {
@@ -162,9 +162,9 @@ export const tripNotes = sqliteTable("trip_notes", {
   body: text("body").notNull(),
   createdAt: text("created_at").default(sql`(datetime('now'))`),
   updatedAt: text("updated_at").default(sql`(datetime('now'))`),
-}, (table) => [
-  index("idx_notes_trip").on(table.tripId),
-]);
+}, (table) => ({
+  tripIdx: index("idx_notes_trip").on(table.tripId),
+}));
 
 // ==================== 11. PUBLIC_ITINERARIES ====================
 export const publicItineraries = sqliteTable("public_itineraries", {
@@ -174,18 +174,18 @@ export const publicItineraries = sqliteTable("public_itineraries", {
   viewCount: integer("view_count").default(0),
   cloneCount: integer("clone_count").default(0),
   publishedAt: text("published_at").default(sql`(datetime('now'))`),
-}, (table) => [
-  index("idx_public_slug").on(table.slug),
-]);
+}, (table) => ({
+  slugIdx: index("idx_public_slug").on(table.slug),
+}));
 
 // ==================== 12. SAVED_DESTINATIONS ====================
 export const savedDestinations = sqliteTable("saved_destinations", {
   userId: text("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
   cityId: text("city_id").notNull().references(() => cities.id, { onDelete: "cascade" }),
   savedAt: text("saved_at").default(sql`(datetime('now'))`),
-}, (table) => [
-  uniqueIndex("pk_saved_dest").on(table.userId, table.cityId),
-]);
+}, (table) => ({
+  pkIdx: uniqueIndex("pk_saved_dest").on(table.userId, table.cityId),
+}));
 
 // ==================== 13. TRIP_CLONES (analytics) ====================
 export const tripClones = sqliteTable("trip_clones", {
@@ -206,9 +206,9 @@ export const sessions = sqliteTable("sessions", {
   expiresAt: text("expires_at").notNull(),
   revoked: integer("revoked", { mode: "boolean" }).default(false),
   createdAt: text("created_at").default(sql`(datetime('now'))`),
-}, (table) => [
-  index("idx_sessions_user").on(table.userId),
-]);
+}, (table) => ({
+  userIdx: index("idx_sessions_user").on(table.userId),
+}));
 
 // ==================== 15. AUDIT_LOGS ====================
 export const auditLogs = sqliteTable("audit_logs", {
@@ -220,7 +220,7 @@ export const auditLogs = sqliteTable("audit_logs", {
   metadata: text("metadata"),  // JSON string
   ipAddress: text("ip_address"),
   createdAt: text("created_at").default(sql`(datetime('now'))`),
-}, (table) => [
-  index("idx_audit_user").on(table.userId),
-  index("idx_audit_created").on(table.createdAt),
-]);
+}, (table) => ({
+  userIdx: index("idx_audit_user").on(table.userId),
+  createdIdx: index("idx_audit_created").on(table.createdAt),
+}));
