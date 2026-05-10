@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useTrip, useAddStop, useRemoveStop } from "../hooks/useTrips";
+import { usePublishTrip, useUnpublishTrip } from "../hooks/usePublic";
 import { exploreApi, type City } from "../lib/trips.api";
 
 
@@ -116,7 +117,25 @@ export function TripDetailPage() {
   const { id } = useParams<{ id: string }>();
   const { data, isLoading, isError } = useTrip(id!);
   const removeStop = useRemoveStop(id!);
+  const publishTrip = usePublishTrip(id!);
+  const unpublishTrip = useUnpublishTrip(id!);
   const [showAddStop, setShowAddStop] = useState(false);
+  const [shareLink, setShareLink] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
+
+  const handlePublish = async () => {
+    const pub = await publishTrip.mutateAsync();
+    const link = `${window.location.origin}/p/${pub.slug}`;
+    setShareLink(link);
+    navigator.clipboard.writeText(link).catch(() => {});
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2500);
+  };
+
+  const handleUnpublish = async () => {
+    await unpublishTrip.mutateAsync();
+    setShareLink(null);
+  };
 
   if (isLoading) return <div className="loading-center"><span className="spinner" style={{ width: "2rem", height: "2rem" }} /></div>;
   if (isError || !data) return (
@@ -153,9 +172,39 @@ export function TripDetailPage() {
           <Link to={`/trips/${id}/packing`} className="btn btn-secondary">🧳 Packing</Link>
           <Link to={`/trips/${id}/notes`} className="btn btn-secondary">📝 Notes</Link>
           <Link to={`/trips/${id}/builder`} className="btn btn-secondary">🗺️ Builder</Link>
+          <button
+            className="btn btn-secondary"
+            onClick={trip.isPublic ? handleUnpublish : handlePublish}
+            disabled={publishTrip.isPending || unpublishTrip.isPending}
+          >
+            {trip.isPublic ? "🔒 Unpublish" : "🌐 Share"}
+          </button>
           <button className="btn btn-primary" onClick={() => setShowAddStop(true)}>➕ Add stop</button>
         </div>
       </div>
+
+      {/* Share link banner */}
+      {(shareLink || trip.isPublic) && (
+        <div className="share-banner">
+          <span className="share-banner-icon">🌐</span>
+          <span className="share-banner-label">Public link:</span>
+          <a
+            href={shareLink ?? `${window.location.origin}/p/...`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="share-banner-link"
+          >{shareLink ?? "published"}</a>
+          {shareLink && (
+            <button className="btn-ghost-sm share-banner-copy" onClick={() => {
+              navigator.clipboard.writeText(shareLink).catch(() => {});
+              setCopied(true);
+              setTimeout(() => setCopied(false), 2000);
+            }}>
+              {copied ? "✅ Copied!" : "📋 Copy"}
+            </button>
+          )}
+        </div>
+      )}
 
       {/* Stops timeline */}
       <section className="stops-section">

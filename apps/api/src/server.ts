@@ -11,6 +11,7 @@ import authRoutes from "./routes/auth.routes.js";
 import tripRoutes from "./routes/trip.routes.js";
 import itineraryRoutes from "./routes/itinerary.routes.js";
 import packingNotesRoutes from "./routes/packing-notes.routes.js";
+import publicRoutes from "./routes/public.routes.js";
 import exploreRoutes from "./routes/explore.routes.js";
 
 const app = express();
@@ -42,6 +43,7 @@ app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/trips", tripRoutes);
 app.use("/api/v1/trips/:tripId", itineraryRoutes);
 app.use("/api/v1/trips/:tripId", packingNotesRoutes);
+app.use("/api/v1", publicRoutes);
 app.use("/api/v1/explore", exploreRoutes);
 
 // ==================== ERROR HANDLING ====================

@@ -12,6 +12,8 @@ import { TripDetailPage } from "./pages/TripDetailPage";
 import { BuilderPage } from "./pages/BuilderPage";
 import { PackingPage } from "./pages/PackingPage";
 import { NotesPage } from "./pages/NotesPage";
+import { PublicTripPage } from "./pages/PublicTripPage";
+import { AdminPage } from "./pages/AdminPage";
 import { useEffect } from "react";
 import { useAuthStore } from "./store/auth.store";
 
@@ -47,10 +49,13 @@ export default function App() {
               <Route path="/trips/:id/builder" element={<BuilderPage />} />
               <Route path="/trips/:id/packing" element={<PackingPage />} />
               <Route path="/trips/:id/notes" element={<NotesPage />} />
+              <Route path="/admin" element={<AdminPage />} />
               <Route path="/explore" element={<div className="page-placeholder">Explore coming soon 🗺️</div>} />
             </Route>
 
             {/* Catch-all */}
+            {/* Public itinerary — no auth needed */}
+            <Route path="/p/:slug" element={<PublicTripPage />} />
             <Route path="*" element={<Navigate to="/dashboard" replace />} />
           </Routes>
         </AuthInit>
