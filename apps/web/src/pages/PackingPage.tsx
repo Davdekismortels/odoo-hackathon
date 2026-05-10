@@ -6,7 +6,9 @@ import {
   useAddPackingItem,
   useTogglePackingItem,
   useRemovePackingItem,
+  useResetPacking,
 } from "../hooks/usePackingNotes";
+
 
 const CATEGORIES = ["clothing", "documents", "electronics", "toiletries", "medication", "misc"] as const;
 type Category = typeof CATEGORIES[number];
@@ -27,6 +29,9 @@ export function PackingPage() {
   const addItem = useAddPackingItem(tripId!);
   const toggleItem = useTogglePackingItem(tripId!);
   const removeItem = useRemovePackingItem(tripId!);
+  const resetPacking = useResetPacking(tripId!);
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
+
 
   const [form, setForm] = useState({ name: "", category: "misc" as Category, quantity: 1 });
   const [filter, setFilter] = useState<Category | "all">("all");
@@ -63,6 +68,26 @@ export function PackingPage() {
           <h1 className="page-title">🧳 Packing List</h1>
           <p className="page-subtitle">Check off items as you pack</p>
         </div>
+        {items.length > 0 && (
+          <div className="page-actions">
+            {showResetConfirm ? (
+              <>
+                <button
+                  className="btn btn-danger btn-sm"
+                  onClick={() => { resetPacking.mutate(); setShowResetConfirm(false); }}
+                  disabled={resetPacking.isPending}
+                >
+                  {resetPacking.isPending ? <span className="spinner" /> : "Yes, reset all"}
+                </button>
+                <button className="btn btn-ghost btn-sm" onClick={() => setShowResetConfirm(false)}>Cancel</button>
+              </>
+            ) : (
+              <button className="btn btn-secondary btn-sm" onClick={() => setShowResetConfirm(true)}>
+                🔄 Reset Checklist
+              </button>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Progress bar */}

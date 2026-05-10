@@ -49,6 +49,18 @@ export function useRemovePackingItem(tripId: string) {
   });
 }
 
+export function useResetPacking(tripId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: () => packingApi.reset(tripId),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: PACKING_KEY(tripId) });
+      toast.success("Checklist reset — all items marked unpacked");
+    },
+    onError: () => toast.error("Failed to reset checklist"),
+  });
+}
+
 // ==================== NOTES HOOKS ====================
 
 export function useNotes(tripId: string) {

@@ -10,6 +10,7 @@ router.use(requireAuth);
 // Packing
 router.get("/packing", packingCtrl.listItems);
 router.post("/packing", packingCtrl.addItem);
+router.post("/packing/reset", packingCtrl.resetItems);
 router.patch("/packing/:itemId/toggle", packingCtrl.toggleItem);
 router.patch("/packing/:itemId", packingCtrl.editItem);
 router.delete("/packing/:itemId", packingCtrl.removeItem);

@@ -46,3 +46,13 @@ export function removeItem(tripId: string, userId: string, itemId: string) {
   assertTripOwner(tripId, userId);
   packingRepo.deletePackingItem(itemId, tripId);
 }
+
+// Reset — unpack all items for a trip
+export function resetItems(tripId: string, userId: string) {
+  assertTripOwner(tripId, userId);
+  const items = packingRepo.findPackingItems(tripId);
+  for (const item of items) {
+    packingRepo.updatePackingItem(item.id, tripId, { isPacked: false });
+  }
+  return listItems(tripId, userId);
+}

@@ -33,6 +33,9 @@ export const packingApi = {
 
   remove: (tripId: string, itemId: string) =>
     api.delete(`/trips/${tripId}/packing/${itemId}`),
+
+  reset: (tripId: string) =>
+    api.post(`/trips/${tripId}/packing/reset`),
 };
 
 // ==================== NOTES ====================

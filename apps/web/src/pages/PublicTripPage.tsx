@@ -1,4 +1,6 @@
+import { useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
+
 import { usePublicTrip, useCloneTrip } from "../hooks/usePublic";
 import { useAuthStore } from "../store/auth.store";
 import type { PublicStop } from "../lib/public.api";
@@ -68,12 +70,31 @@ export function PublicTripPage() {
   const { data, isLoading, isError } = usePublicTrip(slug!);
   const cloneTrip = useCloneTrip(slug!);
   const { isAuthenticated } = useAuthStore();
+  const [copied, setCopied] = useState(false);
+
 
   const handleClone = async () => {
     if (!isAuthenticated) { navigate("/signup"); return; }
     const cloned = await cloneTrip.mutateAsync();
     navigate(`/trips/${cloned.id}`);
   };
+
+  const pageUrl = window.location.href;
+  const shareText = data ? `Check out this trip: ${data.trip.name} \ud83c\udf0d` : "Check out this trip!";
+
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(pageUrl).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  };
+
+  const shareTwitter = () =>
+    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(pageUrl)}`, "_blank");
+
+  const shareWhatsApp = () =>
+    window.open(`https://wa.me/?text=${encodeURIComponent(shareText + " " + pageUrl)}`, "_blank");
+
 
   if (isLoading) {
     return (
@@ -148,6 +169,20 @@ export function PublicTripPage() {
               ? <><span className="spinner" /> Cloning…</>
               : "📋 Clone this itinerary"}
           </button>
+
+          {/* Social sharing */}
+          <div className="pub-share-row">
+            <span className="pub-share-label">Share:</span>
+            <button className="pub-share-btn pub-share-btn--copy" onClick={handleCopyLink}>
+              {copied ? "✅ Copied!" : "🔗 Copy Link"}
+            </button>
+            <button className="pub-share-btn pub-share-btn--twitter" onClick={shareTwitter}>
+              🐦 Twitter
+            </button>
+            <button className="pub-share-btn pub-share-btn--whatsapp" onClick={shareWhatsApp}>
+              💬 WhatsApp
+            </button>
+          </div>
         </div>
         <div className="pub-hero-globe">🌍</div>
       </header>

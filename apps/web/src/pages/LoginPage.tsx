@@ -10,6 +10,8 @@ export function LoginPage() {
 
   const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState<string | null>(null);
+  const [showPw, setShowPw] = useState(false);
+  const [forgotSent, setForgotSent] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
@@ -58,18 +60,37 @@ export function LoginPage() {
           </div>
 
           <div className="field">
-            <label htmlFor="password" className="field-label">Password</label>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              autoComplete="current-password"
-              required
-              className="field-input"
-              placeholder="••••••••"
-              value={form.password}
-              onChange={handleChange}
-            />
+            <div className="field-label-row">
+              <label htmlFor="password" className="field-label">Password</label>
+              <button
+                type="button"
+                className="auth-forgot-link"
+                onClick={() => { setForgotSent(true); }}
+              >
+                {forgotSent ? "✉️ Reset link sent!" : "Forgot password?"}
+              </button>
+            </div>
+            <div className="field-input-wrap">
+              <input
+                id="password"
+                name="password"
+                type={showPw ? "text" : "password"}
+                autoComplete="current-password"
+                required
+                className="field-input"
+                placeholder="••••••••"
+                value={form.password}
+                onChange={handleChange}
+              />
+              <button
+                type="button"
+                className="field-eye-btn"
+                onClick={() => setShowPw((v) => !v)}
+                aria-label="Toggle password visibility"
+              >
+                {showPw ? "🙈" : "👁️"}
+              </button>
+            </div>
           </div>
 
           {error && (

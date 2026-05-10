@@ -49,3 +49,11 @@ export function removeItem(req: Request, res: Response, next: NextFunction) {
     res.json({ success: true, data: { message: "Deleted" } });
   } catch (err) { handleError(err, res, next); }
 }
+
+// POST /api/v1/trips/:tripId/packing/reset
+export function resetItems(req: Request, res: Response, next: NextFunction) {
+  try {
+    const result = packingService.resetItems(String(req.params.tripId), req.user!.id);
+    res.json({ success: true, data: result });
+  } catch (err) { handleError(err, res, next); }
+}
