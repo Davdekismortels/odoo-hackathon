@@ -1,0 +1,76 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --color-bg: #ffffff;
+    --color-surface: #f8fafc;
+    --color-text: #0f172a;
+    --color-text-muted: #64748b;
+    --color-border: #e2e8f0;
+  }
+
+  .dark {
+    --color-bg: #0f172a;
+    --color-surface: #1e293b;
+    --color-text: #f1f5f9;
+    --color-text-muted: #94a3b8;
+    --color-border: #334155;
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-primary-500 text-white px-6 py-2.5 rounded-lg font-medium
+           hover:bg-primary-600 active:bg-primary-700
+           transition-colors duration-200
+           focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2;
+  }
+
+  .btn-accent {
+    @apply bg-accent-500 text-white px-6 py-2.5 rounded-lg font-medium
+           hover:bg-accent-600 active:bg-accent-700
+           transition-colors duration-200
+           focus:outline-none focus:ring-2 focus:ring-accent-400 focus:ring-offset-2;
+  }
+
+  .btn-outline {
+    @apply border-2 border-primary-500 text-primary-600 px-6 py-2.5 rounded-lg font-medium
+           hover:bg-primary-50 active:bg-primary-100
+           transition-colors duration-200
+           focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2;
+  }
+
+  .card {
+    @apply bg-white dark:bg-slate-800 rounded-xl shadow-md
+           border border-slate-200 dark:border-slate-700
+           overflow-hidden transition-shadow duration-200
+           hover:shadow-lg;
+  }
+
+  .input-field {
+    @apply w-full px-4 py-2.5 rounded-lg border border-slate-300 dark:border-slate-600
+           bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100
+           placeholder:text-slate-400
+           focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent
+           transition-all duration-200;
+  }
+}

@@ -1,35 +1,41 @@
-# Odoo
-*.py[cod]
-*$py.class
-__pycache__/
-*.so
-.local/
-.cache/
-.config/
-.gnupg/
-.ssh/
-.pylint.d/
-.mypy_cache/
-.pytest_cache/
-.env
-.venv
-env/
-venv/
-ENV/
+# Dependencies
+node_modules/
+dist/
+build/
 
-# Odoo specific
-*.log
-*.sql
+# Environment
+.env
+.env.local
+.env.production
+
+# Database
 *.sqlite
+*.sqlite3
+*.db
 filestore/
 sessions/
-odoo.conf
-!odoo.conf.example
 
-# IDEs
+# IDE
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
+
+# OS
 .DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Python (if any Odoo remnants)
+*.py[cod]
+*$py.class
+__pycache__/
+
+# Misc
+.cache/
+.temp/
+coverage/
