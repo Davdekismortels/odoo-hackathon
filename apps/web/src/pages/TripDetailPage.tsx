@@ -120,6 +120,7 @@ export function TripDetailPage() {
   const publishTrip = usePublishTrip(id!);
   const unpublishTrip = useUnpublishTrip(id!);
   const [showAddStop, setShowAddStop] = useState(false);
+  const [viewMode, setViewMode] = useState<"timeline" | "calendar">("timeline");
   const [shareLink, setShareLink] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
 
@@ -208,9 +209,27 @@ export function TripDetailPage() {
         </div>
       )}
 
-      {/* Stops timeline */}
+      {/* Stops timeline / calendar */}
       <section className="stops-section">
-        <h2 className="section-title">Itinerary · {stops.length} stop{stops.length !== 1 ? "s" : ""}</h2>
+        <div className="stops-section-header">
+          <h2 className="section-title">Itinerary · {stops.length} stop{stops.length !== 1 ? "s" : ""}</h2>
+          <div className="view-toggle">
+            <button
+              className={`view-toggle-btn ${viewMode === "timeline" ? "view-toggle-btn--active" : ""}`}
+              onClick={() => setViewMode("timeline")}
+              title="Timeline view"
+            >
+              📍 List
+            </button>
+            <button
+              className={`view-toggle-btn ${viewMode === "calendar" ? "view-toggle-btn--active" : ""}`}
+              onClick={() => setViewMode("calendar")}
+              title="Calendar view"
+            >
+              📅 Calendar
+            </button>
+          </div>
+        </div>
 
         {stops.length === 0 ? (
           <div className="empty-state">
@@ -218,6 +237,42 @@ export function TripDetailPage() {
             <h3 className="empty-state-title">No stops yet</h3>
             <p className="empty-state-desc">Add your first city stop to start building the itinerary.</p>
             <button className="btn btn-primary" onClick={() => setShowAddStop(true)}>Add first stop</button>
+          </div>
+        ) : viewMode === "calendar" ? (
+          /* ── CALENDAR VIEW ── */
+          <div className="calendar-view">
+            {stops.map((stop) => {
+              const arrival = new Date(stop.arrivalDate);
+              const departure = new Date(stop.departureDate);
+              const days = Math.max(1, Math.round((departure.getTime() - arrival.getTime()) / 86400000));
+              return (
+                <div key={stop.id} className="calendar-stop-block">
+                  <div className="calendar-stop-date-col">
+                    <div className="calendar-month">
+                      {arrival.toLocaleDateString(undefined, { month: "short" })}
+                    </div>
+                    <div className="calendar-day">{arrival.getDate()}</div>
+                    <div className="calendar-nights">{days}d</div>
+                  </div>
+                  <div className="calendar-stop-body">
+                    <div className="calendar-stop-city">
+                      <span className="calendar-city-dot" />
+                      {stop.city.name}
+                      <span className="calendar-country">{stop.city.countryCode}</span>
+                    </div>
+                    <div className="calendar-stop-range">
+                      {arrival.toLocaleDateString(undefined, { month: "short", day: "numeric" })}
+                      {" → "}
+                      {departure.toLocaleDateString(undefined, { month: "short", day: "numeric" })}
+                    </div>
+                    {stop.accommodation && (
+                      <div className="calendar-accommodation">🏨 {stop.accommodation}</div>
+                    )}
+                    <div className="calendar-hint">🗺️ Open Builder to see activities</div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         ) : (
           <ol className="stops-timeline">

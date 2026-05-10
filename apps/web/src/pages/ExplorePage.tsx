@@ -1,6 +1,8 @@
 import { useState, useMemo } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
 import { api } from "../lib/api";
+import { tripsApi, stopsApi } from "../lib/trips.api";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 interface City {
@@ -84,12 +86,132 @@ const CATEGORY_ICONS: Record<string, string> = {
   nightlife: "🌃",
 };
 
+// ── Add To Trip Modal ──────────────────────────────────────────────────────
+function AddToTripModal({ city, onClose }: { city: City; onClose: () => void }) {
+  const [selectedTripId, setSelectedTripId] = useState<string>("");
+  const [arrivalDate, setArrivalDate] = useState("");
+  const [departureDate, setDepartureDate] = useState("");
+  const [error, setError] = useState("");
+
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
+  const { data: trips = [], isLoading: tripsLoading } = useQuery({
+    queryKey: ["trips"],
+    queryFn: tripsApi.list,
+  });
+
+  const activeTrips = trips.filter((t) => t.status === "planning" || t.status === "booked");
+
+  const addMutation = useMutation({
+    mutationFn: () => {
+      if (!selectedTripId || !arrivalDate || !departureDate) {
+        throw new Error("Please select a trip and dates");
+      }
+      return stopsApi.add(selectedTripId, {
+        cityId: city.id,
+        arrivalDate,
+        departureDate,
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["trips"] });
+      queryClient.invalidateQueries({ queryKey: ["trip", selectedTripId] });
+      onClose();
+      // Optionally navigate to the trip builder
+      navigate(`/trips/${selectedTripId}`);
+    },
+    onError: (err: any) => {
+      setError(err.message || "Failed to add stop");
+    },
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    addMutation.mutate();
+  };
+
+  return (
+    <div className="modal-backdrop">
+      <div className="modal-content">
+        <h2>Add {city.name} to Trip</h2>
+        <p className="modal-desc">Select an active trip and dates to add this destination.</p>
+
+        {error && <div className="form-error">{error}</div>}
+
+        {tripsLoading ? (
+          <p>Loading your trips...</p>
+        ) : activeTrips.length === 0 ? (
+          <div className="empty-state">
+            <p>You don't have any active trips.</p>
+            <button type="button" className="btn btn-primary" onClick={() => navigate("/trips/new")}>
+              Create a Trip
+            </button>
+            <button type="button" className="btn-ghost" onClick={onClose} style={{ marginTop: 8 }}>
+              Cancel
+            </button>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="form-stack">
+            <div className="field-group">
+              <label>Select Trip</label>
+              <select
+                className="field-input"
+                value={selectedTripId}
+                onChange={(e) => setSelectedTripId(e.target.value)}
+                required
+              >
+                <option value="">-- Choose a trip --</option>
+                {activeTrips.map((t) => (
+                  <option key={t.id} value={t.id}>{t.name}</option>
+                ))}
+              </select>
+            </div>
+            <div className="field-row">
+              <div className="field-group">
+                <label>Arrival Date</label>
+                <input
+                  type="date"
+                  className="field-input"
+                  value={arrivalDate}
+                  onChange={(e) => setArrivalDate(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="field-group">
+                <label>Departure Date</label>
+                <input
+                  type="date"
+                  className="field-input"
+                  value={departureDate}
+                  onChange={(e) => setDepartureDate(e.target.value)}
+                  required
+                />
+              </div>
+            </div>
+            <div className="modal-actions">
+              <button type="button" className="btn-ghost" onClick={onClose} disabled={addMutation.isPending}>
+                Cancel
+              </button>
+              <button type="submit" className="btn btn-primary" disabled={addMutation.isPending}>
+                {addMutation.isPending ? "Adding..." : "Add Stop"}
+              </button>
+            </div>
+          </form>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // ── Component ──────────────────────────────────────────────────────────────
 export function ExplorePage() {
   const [search, setSearch] = useState("");
   const [countryFilter, setCountryFilter] = useState("");
   const [selectedCityId, setSelectedCityId] = useState<string | null>(null);
   const [activityFilter, setActivityFilter] = useState<string | null>(null);
+  const [cityToAdd, setCityToAdd] = useState<City | null>(null);
 
   const { data: cities = [], isLoading: citiesLoading } = useCities(search, countryFilter);
   const { data: countries = [] } = useCountries();
@@ -185,6 +307,18 @@ export function ExplorePage() {
                       </span>
                     )}
                   </div>
+                  <div style={{ marginTop: "1rem" }}>
+                    <button
+                      className="btn btn-primary"
+                      style={{ width: "100%", padding: "0.4rem" }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setCityToAdd(city);
+                      }}
+                    >
+                      + Add to Trip
+                    </button>
+                  </div>
                 </button>
               ))}
             </div>
@@ -274,6 +408,10 @@ export function ExplorePage() {
           )}
         </section>
       </div>
+
+      {cityToAdd && (
+        <AddToTripModal city={cityToAdd} onClose={() => setCityToAdd(null)} />
+      )}
     </div>
   );
 }
