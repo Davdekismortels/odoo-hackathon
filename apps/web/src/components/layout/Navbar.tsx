@@ -44,9 +44,11 @@ export function Navbar() {
                   <p className="avatar-name">{user?.fullName}</p>
                   <p className="avatar-email">{user?.email}</p>
                   <hr className="dropdown-divider" />
-                  <Link to="/profile" className="dropdown-item" onClick={() => setMenuOpen(false)}>
-                    Profile
-                  </Link>
+                  {user?.role === "admin" && (
+                    <Link to="/admin" className="dropdown-item" onClick={() => setMenuOpen(false)}>
+                      ⚙️ Admin
+                    </Link>
+                  )}
                   <button className="dropdown-item dropdown-item--danger" onClick={handleLogout}>
                     Sign out
                   </button>
