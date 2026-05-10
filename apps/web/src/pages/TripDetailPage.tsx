@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useParams, Link, useNavigate } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { useTrip, useAddStop, useRemoveStop } from "../hooks/useTrips";
 import { exploreApi, type City } from "../lib/trips.api";
 
@@ -114,7 +114,6 @@ function AddStopModal({ tripId, onClose }: { tripId: string; onClose: () => void
 
 export function TripDetailPage() {
   const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
   const { data, isLoading, isError } = useTrip(id!);
   const removeStop = useRemoveStop(id!);
   const [showAddStop, setShowAddStop] = useState(false);
@@ -151,7 +150,8 @@ export function TripDetailPage() {
           </div>
         </div>
         <div className="trip-detail-actions">
-          <button className="btn btn-secondary" onClick={() => navigate(`/trips/${id}/edit`)}>✏️ Edit</button>
+          <Link to={`/trips/${id}/packing`} className="btn btn-secondary">🧳 Packing</Link>
+          <Link to={`/trips/${id}/notes`} className="btn btn-secondary">📝 Notes</Link>
           <Link to={`/trips/${id}/builder`} className="btn btn-secondary">🗺️ Builder</Link>
           <button className="btn btn-primary" onClick={() => setShowAddStop(true)}>➕ Add stop</button>
         </div>
