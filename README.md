@@ -26,7 +26,7 @@ This repository is set up to meet the **Must Have** requirements for the Odoo Ha
 - **Tip**: Organize your `menuitem` tags logically in `views/`.
 
 ## 📈 Getting Started
-1.  **Clone the repo**: `git clone git@github.com:YOUR_USERNAME/YOUR_REPO.git`
+1.  **Clone the repo**: `git clone git@github.com:Davdekismortels/odoo-hackathon.git`
 2.  **Read the Guide**: See [Teammate_Guide.md](Teammate_Guide.md) for detailed instructions.
 3.  **Start Coding**: Create your module inside `custom_addons/`.
 
