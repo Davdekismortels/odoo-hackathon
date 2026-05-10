@@ -78,3 +78,11 @@ export function cloneTrip(slug: string, userId: string) {
 export function getStats() {
   return publicRepo.getAdminStats();
 }
+
+export function getTrending(limit = 8) {
+  return publicRepo.getTrendingPublic(limit);
+}
+
+export function getAdminUsers(search?: string) {
+  return publicRepo.getAdminUsers(search);
+}

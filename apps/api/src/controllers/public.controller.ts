@@ -57,3 +57,25 @@ export function adminStats(req: Request, res: Response, next: NextFunction) {
     res.json({ success: true, data: stats });
   } catch (err) { handleError(err, res, next); }
 }
+
+// GET /api/v1/admin/users  (auth required, admin role)
+export function adminUsers(req: Request, res: Response, next: NextFunction) {
+  try {
+    if (req.user!.role !== "admin") {
+      res.status(403).json({ success: false, error: { code: "FORBIDDEN", message: "Admin only" } });
+      return;
+    }
+    const search = req.query.q as string | undefined;
+    const users = publicService.getAdminUsers(search);
+    res.json({ success: true, data: { users } });
+  } catch (err) { handleError(err, res, next); }
+}
+
+// GET /api/v1/public  (no auth) — trending itineraries
+export function getTrending(req: Request, res: Response, next: NextFunction) {
+  try {
+    const limit = Math.min(20, Number(req.query.limit ?? 8) || 8);
+    const items = publicService.getTrending(limit);
+    res.json({ success: true, data: { items } });
+  } catch (err) { handleError(err, res, next); }
+}

@@ -111,3 +111,50 @@ export function getAdminStats() {
 
   return { totalUsers, totalTrips, totalPublic, topCities, recentTrips };
 }
+
+// ==================== TRENDING PUBLIC ITINERARIES ====================
+
+export function getTrendingPublic(limit = 8) {
+  return db
+    .select({
+      slug: publicItineraries.slug,
+      viewCount: publicItineraries.viewCount,
+      cloneCount: publicItineraries.cloneCount,
+      publishedAt: publicItineraries.publishedAt,
+      tripId: trips.id,
+      tripName: trips.name,
+      tripDescription: trips.description,
+      startDate: trips.startDate,
+      endDate: trips.endDate,
+      currencyCode: trips.currencyCode,
+      budgetLimit: trips.budgetLimit,
+    })
+    .from(publicItineraries)
+    .leftJoin(trips, eq(publicItineraries.tripId, trips.id))
+    .orderBy(desc(publicItineraries.viewCount))
+    .limit(limit)
+    .all();
+}
+
+// ==================== ADMIN USERS ====================
+
+export function getAdminUsers(search?: string, limit = 50) {
+  const rows = db
+    .select({
+      id: users.id,
+      email: users.email,
+      fullName: users.fullName,
+      role: users.role,
+      createdAt: users.createdAt,
+      deletedAt: users.deletedAt,
+    })
+    .from(users)
+    .orderBy(desc(users.createdAt))
+    .limit(limit)
+    .all();
+  if (!search) return rows;
+  const s = search.toLowerCase();
+  return rows.filter((u) =>
+    u.email?.toLowerCase().includes(s) || u.fullName?.toLowerCase().includes(s)
+  );
+}

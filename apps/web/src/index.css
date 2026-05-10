@@ -1784,3 +1784,275 @@ input, select, textarea { font: inherit; }
   display: flex; align-items: center; justify-content: center;
   min-height: 40vh;
 }
+
+/* ============================================================
+   TRIP LIST PAGE — filters + search + delete
+   ============================================================ */
+.trips-controls {
+  display: flex;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  align-items: center;
+}
+.trips-search { flex: 1; min-width: 200px; max-width: 340px; }
+.trips-sort   { width: 140px; }
+
+.status-tabs {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+.status-tab {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 0.4rem 1rem;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--color-border);
+  background: transparent;
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.status-tab:hover { border-color: var(--color-primary); color: var(--color-primary); }
+.status-tab--active {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: #fff;
+  font-weight: 600;
+}
+.status-tab-count {
+  background: rgba(255,255,255,0.2);
+  border-radius: var(--radius-full);
+  padding: 0 6px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1.6;
+}
+.status-tab--active .status-tab-count { background: rgba(0,0,0,0.15); }
+
+.trip-card-wrapper { position: relative; }
+.trip-delete-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(0,0,0,0.5);
+  border: none;
+  border-radius: var(--radius-full);
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity var(--transition);
+  z-index: 2;
+}
+.trip-card-wrapper:hover .trip-delete-btn { opacity: 1; }
+.trip-delete-confirm {
+  position: absolute;
+  inset: 0;
+  background: rgba(15,23,42,0.92);
+  border-radius: var(--radius-xl);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  z-index: 10;
+  padding: var(--space-4);
+  backdrop-filter: blur(4px);
+}
+.trip-delete-confirm p { font-size: 0.9rem; text-align: center; }
+.btn-danger {
+  background: var(--color-error, #ef4444);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-lg);
+  padding: 0.4rem 1rem;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+.btn-danger:hover { background: #dc2626; }
+
+/* ============================================================
+   ADMIN PAGE — tabs, users table, trending grid
+   ============================================================ */
+.admin-tabs {
+  display: flex;
+  gap: var(--space-2);
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: var(--space-1);
+  flex-wrap: wrap;
+}
+.admin-tab {
+  padding: 0.5rem 1.2rem;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  border: 1px solid transparent;
+  border-bottom: none;
+  background: transparent;
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.admin-tab:hover { color: var(--color-text); }
+.admin-tab--active {
+  background: var(--color-bg-card);
+  border-color: var(--color-border);
+  color: var(--color-primary);
+  font-weight: 700;
+  margin-bottom: -1px;
+}
+
+.admin-stat-sub { font-size: 0.72rem; color: var(--color-text-faint); margin-top: 2px; }
+
+.admin-card--full { grid-column: 1 / -1; }
+.admin-card-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+/* Users table */
+.admin-users-table {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  font-size: 0.85rem;
+}
+.admin-users-head {
+  display: grid;
+  grid-template-columns: 1.5fr 2fr 0.8fr 1fr 0.8fr;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  background: rgba(255,255,255,0.04);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--color-text-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-bottom: 1px solid var(--color-border);
+}
+.admin-users-row {
+  display: grid;
+  grid-template-columns: 1.5fr 2fr 0.8fr 1fr 0.8fr;
+  gap: var(--space-2);
+  align-items: center;
+  padding: var(--space-2) var(--space-4);
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  transition: background var(--transition);
+}
+.admin-users-row:last-child { border-bottom: none; }
+.admin-users-row:hover { background: rgba(255,255,255,0.03); }
+.admin-users-row--deleted { opacity: 0.5; }
+.admin-user-name { font-weight: 600; }
+.admin-user-email { color: var(--color-text-muted); font-size: 0.8rem; word-break: break-all; }
+.admin-user-date { color: var(--color-text-faint); font-size: 0.78rem; }
+.admin-users-note {
+  margin-top: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  background: rgba(255,255,255,0.03);
+  border-radius: var(--radius-lg);
+  font-size: 0.8rem;
+  color: var(--color-text-faint);
+  border: 1px solid var(--color-border);
+}
+.admin-users-note code {
+  background: rgba(255,255,255,0.08);
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 0.78rem;
+  font-family: monospace;
+}
+
+/* Trending grid */
+.admin-trending-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: var(--space-4);
+}
+.admin-trending-card {
+  background: var(--color-bg-surface, rgba(255,255,255,0.04));
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  text-decoration: none;
+  transition: all var(--transition);
+}
+.admin-trending-card:hover {
+  border-color: rgba(37,99,235,0.4);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+.admin-trending-name { font-weight: 700; font-size: 0.95rem; color: var(--color-text); }
+.admin-trending-meta { display: flex; flex-wrap: wrap; gap: var(--space-2); font-size: 0.8rem; color: var(--color-text-faint); }
+.admin-trending-slug { font-size: 0.72rem; color: var(--color-primary); font-family: monospace; }
+
+/* badge extras */
+.badge--red { background: rgba(239,68,68,0.15); color: #ef4444; border: 1px solid rgba(239,68,68,0.3); }
+
+/* ============================================================
+   DASHBOARD TRENDING SECTION
+   ============================================================ */
+.section-hint { font-size: 0.82rem; color: var(--color-text-faint); }
+
+.trending-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: var(--space-4);
+}
+
+.trending-card {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-4) var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  text-decoration: none;
+  color: inherit;
+  transition: all var(--transition);
+  position: relative;
+  overflow: hidden;
+}
+.trending-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(37,99,235,0.04) 0%, transparent 60%);
+  opacity: 0;
+  transition: opacity var(--transition);
+}
+.trending-card:hover {
+  border-color: rgba(37,99,235,0.35);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.3);
+}
+.trending-card:hover::before { opacity: 1; }
+
+.trending-card-name { font-weight: 700; font-size: 0.95rem; color: var(--color-text); }
+.trending-card-desc { font-size: 0.8rem; color: var(--color-text-faint); line-height: 1.5; }
+.trending-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  font-size: 0.78rem;
+  color: var(--color-text-faint);
+  margin-top: auto;
+  padding-top: var(--space-2);
+  border-top: 1px solid rgba(255,255,255,0.06);
+}

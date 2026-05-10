@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { useAuthStore } from "../store/auth.store";
 import { useTrips } from "../hooks/useTrips";
+import { useTrending } from "../hooks/usePublic";
 
 const quickActions = [
   { icon: "➕", label: "New trip", href: "/trips/new", primary: true },
@@ -135,6 +136,9 @@ export function DashboardPage() {
         )}
       </section>
 
+      {/* Trending community itineraries */}
+      <TrendingSection />
+
       {/* Feature highlights */}
       <section className="dashboard-section">
         <div className="section-header">
@@ -151,5 +155,38 @@ export function DashboardPage() {
         </div>
       </section>
     </div>
+  );
+}
+
+function TrendingSection() {
+  const { data: items = [], isLoading } = useTrending(6);
+
+  if (isLoading) return null;
+  if (items.length === 0) return null;
+
+  return (
+    <section className="dashboard-section">
+      <div className="section-header">
+        <h2 className="section-title">🔥 Trending Itineraries</h2>
+        <span className="section-hint">Community favourites — clone and customize</span>
+      </div>
+      <div className="trending-grid">
+        {items.map((item) => (
+          <Link key={item.slug} to={`/p/${item.slug}`} className="trending-card" target="_blank" rel="noopener">
+            <div className="trending-card-name">{item.tripName ?? "Unnamed trip"}</div>
+            {item.tripDescription && (
+              <p className="trending-card-desc">{item.tripDescription.slice(0, 80)}{item.tripDescription.length > 80 ? "…" : ""}</p>
+            )}
+            <div className="trending-card-meta">
+              <span>👁️ {item.viewCount ?? 0}</span>
+              <span>📋 {item.cloneCount ?? 0} clones</span>
+              {item.currencyCode && item.budgetLimit && (
+                <span>💰 {item.currencyCode} {Number(item.budgetLimit).toLocaleString()}</span>
+              )}
+            </div>
+          </Link>
+        ))}
+      </div>
+    </section>
   );
 }

@@ -60,6 +60,29 @@ export interface AdminStats {
   recentTrips: { id: string; name: string; createdAt: string | null; status: string | null }[];
 }
 
+export interface TrendingItem {
+  slug: string;
+  viewCount: number | null;
+  cloneCount: number | null;
+  publishedAt: string | null;
+  tripId: string | null;
+  tripName: string | null;
+  tripDescription: string | null;
+  startDate: string | null;
+  endDate: string | null;
+  currencyCode: string | null;
+  budgetLimit: number | null;
+}
+
+export interface AdminUser {
+  id: string;
+  email: string | null;
+  fullName: string | null;
+  role: string | null;
+  createdAt: string | null;
+  deletedAt: string | null;
+}
+
 // ==================== API CALLS ====================
 
 export const publicApi = {
@@ -85,4 +108,15 @@ export const publicApi = {
   adminStats: () =>
     api.get<{ success: true; data: AdminStats }>("/admin/stats")
       .then((r) => r.data.data),
+
+  adminUsers: (search?: string) =>
+    api.get<{ success: true; data: { users: AdminUser[] } }>(
+      `/admin/users${search ? `?q=${encodeURIComponent(search)}` : ""}`
+    ).then((r) => r.data.data.users),
+
+  // Trending (no auth)
+  trending: (limit = 8) =>
+    axios.get<{ success: true; data: { items: TrendingItem[] } }>(
+      `${BASE_URL}/public?limit=${limit}`
+    ).then((r) => r.data.data.items),
 };

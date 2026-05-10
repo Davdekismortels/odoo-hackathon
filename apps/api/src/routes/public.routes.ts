@@ -10,6 +10,7 @@ router.post("/:tripId/publish", requireAuth, publicCtrl.publish);
 router.delete("/:tripId/publish", requireAuth, publicCtrl.unpublish);
 
 // ── Public read (no auth) ─────────────────────────────────────────────────────
+router.get("/public", publicCtrl.getTrending);          // GET /public (trending)
 router.get("/public/:slug", publicCtrl.getPublic);
 
 // ── Clone (auth required) ─────────────────────────────────────────────────────
@@ -17,5 +18,6 @@ router.post("/public/:slug/clone", requireAuth, publicCtrl.clone);
 
 // ── Admin ─────────────────────────────────────────────────────────────────────
 router.get("/admin/stats", requireAuth, publicCtrl.adminStats);
+router.get("/admin/users", requireAuth, publicCtrl.adminUsers);
 
 export default router;

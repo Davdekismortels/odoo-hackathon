@@ -39,3 +39,20 @@ export function useAdminStats() {
     retry: false,
   });
 }
+
+export function useTrending(limit = 8) {
+  return useQuery({
+    queryKey: ["trending", limit],
+    queryFn: () => publicApi.trending(limit),
+    staleTime: 5 * 60 * 1000, // 5 min
+  });
+}
+
+export function useAdminUsers(search?: string) {
+  return useQuery({
+    queryKey: ["admin-users", search],
+    queryFn: () => publicApi.adminUsers(search),
+    retry: false,
+    enabled: true,
+  });
+}
