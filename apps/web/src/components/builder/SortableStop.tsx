@@ -55,8 +55,12 @@ export function SortableStop({ tripId, stop, currencyCode }: Props) {
     const result = await exploreApi.cities(stop.city.name);
     const city = result[0];
     if (city) {
-      const acts = await fetch(`/api/v1/explore/cities/${city.id}/activities`).then((r) => r.json()).then((d) => d.data?.activities ?? []);
-      setCityActivities(acts);
+      try {
+        const { data } = await import("../../lib/api").then((m) => m.api.get(`/explore/cities/${city.id}/activities`));
+        setCityActivities(data.data?.activities ?? []);
+      } catch {
+        setCityActivities([]);
+      }
     }
   };
 

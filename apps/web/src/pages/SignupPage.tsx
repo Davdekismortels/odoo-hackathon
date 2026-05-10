@@ -12,7 +12,7 @@ function validateForm(form: { email: string; password: string; fullName: string 
   if (form.password.length < 8) errors.password = "At least 8 characters required";
   else if (!/[A-Z]/.test(form.password)) errors.password = "Include at least one uppercase letter";
   else if (!/[0-9]/.test(form.password)) errors.password = "Include at least one number";
-  else if (!/[^A-Za-z0-9]/.test(form.password)) errors.password = "Include a special character (!@#$)";
+  else if (!/[^A-Za-z0-9]/.test(form.password)) errors.password = "Include at least one special character";
   return errors;
 }
 

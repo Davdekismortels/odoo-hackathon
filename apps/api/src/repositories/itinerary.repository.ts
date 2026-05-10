@@ -62,3 +62,4 @@ export function reorderStops(updates: Array<{ id: string; orderIndex: number }>)
   });
   runAll(updates);
 }
+
